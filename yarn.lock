@@ -1973,6 +1973,11 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
+"@noble/hashes@^1.1.5":
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.4.0.tgz#45814aa329f30e4fe0ba49426f49dfccdd066426"
+  integrity sha512-V1JJ1WTRUqHHrOSh597hURcMqVKVGL/ea3kv0gSnEdsEZ0/+VyPghM1lMNGc00z7CIQorSvbKpuJkxvuHbvdbg==
+
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
   resolved "https://registry.yarnpkg.com/@nodelib/fs.scandir/-/fs.scandir-2.1.5.tgz#7619c2eb21b25483f6d167548b4cfd5a7488c3d5"
@@ -2000,6 +2005,13 @@
   integrity sha512-q9CRWjpHCMIh5sVyefoD1cA7PkvILqCZsnSOEUUivORLjxCO/Irmue2DprETiNgEqktDBZaM1Bi+jrarx1XdCg==
   dependencies:
     semver "^7.3.5"
+
+"@paralleldrive/cuid2@^2.2.2":
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/@paralleldrive/cuid2/-/cuid2-2.2.2.tgz#7f91364d53b89e2c9cb9e02e8dd0f129e834455f"
+  integrity sha512-ZOBkgDwEdoYVlSeRbYYXs0S9MejQofiVYoTbKzy/6GQa39/q5tQU2IX46+shYnUkpEl3wc+J6wRlar7r2EK2xA==
+  dependencies:
+    "@noble/hashes" "^1.1.5"
 
 "@pkgjs/parseargs@^0.11.0":
   version "0.11.0"
@@ -2534,6 +2546,18 @@
   integrity sha512-V4BG07kuYSUkTCSBHG8G8TNhM+F19jXFWnQtzj+we8DrkpSBCee9Z3Ms8yiGer/dlmhe35/Xdgyo3/0rQKg7YA==
   dependencies:
     "@sinonjs/commons" "^3.0.0"
+
+"@tanstack/query-core@5.40.0":
+  version "5.40.0"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-5.40.0.tgz#c74ae8303752ed4b5a0ab848ec71a0e6e8179f83"
+  integrity sha512-eD8K8jsOIq0Z5u/QbvOmfvKKE/XC39jA7yv4hgpl/1SRiU+J8QCIwgM/mEHuunQsL87dcvnHqSVLmf9pD4CiaA==
+
+"@tanstack/react-query@^5.40.1":
+  version "5.40.1"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-5.40.1.tgz#c1098791fea42bdc4c48938fb0131fa9ccc30fae"
+  integrity sha512-gOcmu+gpFd2taHrrgMM9RemLYYEDYfsCqszxCC0xtx+csDa4R8t7Hr7SfWXQP13S2sF+mOxySo/+FNXJFYBqcA==
+  dependencies:
+    "@tanstack/query-core" "5.40.0"
 
 "@tootallnate/once@2":
   version "2.0.0"
@@ -8109,7 +8133,7 @@ reactotron-react-js@^3.3.11:
     reactotron-core-client "2.9.3"
     stacktrace-js "2.0.1"
 
-reactotron-react-native@^5.0.5:
+reactotron-react-native@^5.1.7:
   version "5.1.7"
   resolved "https://registry.yarnpkg.com/reactotron-react-native/-/reactotron-react-native-5.1.7.tgz#eb344d274615f505c0ec716dc622690e2356e7cb"
   integrity sha512-JA2NpnPJo7tHew9tMzELslmF8JX/5pDftrvrG63diZ1uW0S7UYufS47JVZEGsGozgMttERp0APMBdiTBrPW1iQ==

@@ -32,11 +32,13 @@
   "dependencies": {
     "@expo-google-fonts/space-grotesk": "^0.2.2",
     "@expo/metro-runtime": "~3.2.1",
+    "@paralleldrive/cuid2": "^2.2.2",
     "@react-native-async-storage/async-storage": "^1.21.0",
     "@react-navigation/bottom-tabs": "^6.3.2",
     "@react-navigation/native": "^6.0.2",
     "@react-navigation/native-stack": "^6.0.2",
     "@shopify/flash-list": "^1.6.3",
+    "@tanstack/react-query": "^5.40.1",
     "apisauce": "3.0.1",
     "date-fns": "^2.30.0",
     "expo": "~51.0.8",
@@ -98,7 +100,7 @@
     "reactotron-core-client": "^2.8.13",
     "reactotron-mst": "^3.1.7",
     "reactotron-react-js": "^3.3.11",
-    "reactotron-react-native": "^5.0.5",
+    "reactotron-react-native": "^5.1.7",
     "ts-jest": "^29.1.1",
     "ts-node": "^10.9.2",
     "typescript": "~5.3.3"
