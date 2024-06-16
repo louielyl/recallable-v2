@@ -30,6 +30,11 @@ import { customFontsToLoad } from "./theme"
 import Config from "./config"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { ViewStyle } from "react-native"
+import { SQLiteProvider } from "expo-sqlite"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { runMigration } from "./data/migrations"
+
+const queryClient = new QueryClient()
 
 export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE"
 
@@ -101,11 +106,15 @@ function App(props: AppProps) {
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <ErrorBoundary catchErrors={Config.catchErrors}>
         <GestureHandlerRootView style={$container}>
-          <AppNavigator
-            linking={linking}
-            initialState={initialNavigationState}
-            onStateChange={onNavigationStateChange}
-          />
+          <QueryClientProvider client={queryClient}>
+            <SQLiteProvider databaseName="recallable.db" onInit={runMigration}>
+              <AppNavigator
+                linking={linking}
+                initialState={initialNavigationState}
+                onStateChange={onNavigationStateChange}
+              />
+            </SQLiteProvider>
+          </QueryClientProvider>
         </GestureHandlerRootView>
       </ErrorBoundary>
     </SafeAreaProvider>
