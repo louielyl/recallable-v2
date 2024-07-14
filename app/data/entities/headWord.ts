@@ -1,17 +1,11 @@
-export type DBHeadWord = {
-  id: string
+import { DBTimestampBase, TimestampBase } from "./base"
+
+export type DBHeadWord = DBTimestampBase & {
   content: string | null
-  created_at: string | null
-  updated_at: string | null
-  deleted_at: string | null
 }
 
-export type HeadWord = {
-  id: string
+export type HeadWord = TimestampBase & {
   content: string | null
-  created_at: Date | null
-  updated_at: Date | null
-  deleted_at: Date | null
 }
 
 export type HeadWordCreate = Partial<HeadWord> & Pick<HeadWord, "content">
