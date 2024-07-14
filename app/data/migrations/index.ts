@@ -1,38 +1,39 @@
 import { createId } from "@paralleldrive/cuid2"
 import { SQLiteDatabase } from "expo-sqlite"
-import { createHeadWord, deleteHeadWord } from "../crud/headWord"
+import { createHeadWord, deleteHeadWord, updateHeadWord } from "crud/headWord"
+import { HeadWord } from "../entities/headWord"
 
 // TODO: Divide into multiple migration files.
 export async function runMigration(db: SQLiteDatabase) {
-	const DATABASE_VERSION = 1
-	const wipe_db = false
+  const DATABASE_VERSION = 1
+  const wipe_db = false
 
-	let { user_version: currentDbVersion } = (await db.getFirstAsync<{ user_version: number }>(
-		"PRAGMA user_version",
-	)) as { user_version: number }
+  let { user_version: currentDbVersion } = (await db.getFirstAsync<{
+    user_version: number
+  }>("PRAGMA user_version")) as { user_version: number }
 
-	if (wipe_db) {
-		await db.execAsync("DROP TABLE head_words")
-		await db.execAsync("DROP TABLE definitions")
-		await db.execAsync("DROP TABLE head_word_definition_mapping")
-		await db.execAsync("DROP TABLE cards")
-		await db.execAsync("DROP TABLE review_logs")
-		await db.execAsync("DROP TABLE parameters")
-		await db.execAsync(`PRAGMA user_version = 0`)
-		console.log("WIPED")
-		return
-	}
+  if (wipe_db) {
+    await db.execAsync("DROP TABLE head_words")
+    await db.execAsync("DROP TABLE definitions")
+    await db.execAsync("DROP TABLE head_word_definition_mapping")
+    await db.execAsync("DROP TABLE cards")
+    await db.execAsync("DROP TABLE review_logs")
+    await db.execAsync("DROP TABLE parameters")
+    await db.execAsync(`PRAGMA user_version = 0`)
+    console.log("WIPED")
+    return
+  }
 
-	// if (currentDbVersion >= DATABASE_VERSION) {
-	// 	return
-	// }
+  // if (currentDbVersion >= DATABASE_VERSION) {
+  // 	return
+  // }
 
-	if (currentDbVersion <= DATABASE_VERSION && currentDbVersion === 0) {
-		await db.execAsync("PRAGMA journal_mode = WAL")
-		await db.execAsync("PRAGMA foreign_keys = ON")
-		// NOTE: Schema migration
-		await db.withExclusiveTransactionAsync(async (txn) => {
-			await txn.execAsync(`
+  if (currentDbVersion <= DATABASE_VERSION && currentDbVersion === 0) {
+    await db.execAsync("PRAGMA journal_mode = WAL")
+    await db.execAsync("PRAGMA foreign_keys = ON")
+    // NOTE: Schema migration
+    await db.withExclusiveTransactionAsync(async (txn) => {
+      await txn.execAsync(`
 			CREATE TABLE "head_words" (
 				"id" TEXT PRIMARY KEY NOT NULL,
 				"content" TEXT NOT NULL,
@@ -42,7 +43,7 @@ export async function runMigration(db: SQLiteDatabase) {
 				CONSTRAINT "UQ_${createId()}" UNIQUE ("content")
 			)`)
 
-			await txn.execAsync(`
+      await txn.execAsync(`
 			CREATE TABLE "definitions" (
 				"id" TEXT PRIMARY KEY NOT NULL,
 				"content" TEXT NOT NULL,
@@ -53,7 +54,7 @@ export async function runMigration(db: SQLiteDatabase) {
 				CONSTRAINT "UQ_${createId()}" UNIQUE ("content")
 			)`)
 
-			await txn.execAsync(`
+      await txn.execAsync(`
 			CREATE TABLE "head_word_definition_mapping" (
 				"id" TEXT PRIMARY KEY NOT NULL,
 				"head_word_id" TEXT NOT NULL,
@@ -65,7 +66,7 @@ export async function runMigration(db: SQLiteDatabase) {
 				FOREIGN KEY(definition_id) REFERENCES definitions(id)
 			)`)
 
-			await txn.execAsync(`
+      await txn.execAsync(`
 			CREATE TABLE "cards" (
 				"id" TEXT PRIMARY KEY NOT NULL,
 				"head_word_id" TEXT NOT NULL,
@@ -85,7 +86,7 @@ export async function runMigration(db: SQLiteDatabase) {
 				FOREIGN KEY(head_word_id) REFERENCES head_words(id)
 			)`)
 
-			await txn.execAsync(`
+      await txn.execAsync(`
 			CREATE TABLE "review_logs" (
 				"id" TEXT PRIMARY KEY NOT NULL,
 				"head_word_id" TEXT NOT NULL,
@@ -105,7 +106,7 @@ export async function runMigration(db: SQLiteDatabase) {
 				FOREIGN KEY(head_word_id) REFERENCES head_words(id)
 			)`)
 
-			await txn.execAsync(`
+      await txn.execAsync(`
 			CREATE TABLE "parameters" (
 				"id" TEXT PRIMARY KEY NOT NULL,
 				"head_word_id" TEXT NOT NULL,
@@ -122,20 +123,25 @@ export async function runMigration(db: SQLiteDatabase) {
 				"deleted_at" DATETIME,
 				FOREIGN KEY(head_word_id) REFERENCES head_words(id)
 			)`)
-		})
+    })
 
-		// NOTE: Seed
-		await db.execAsync(`PRAGMA user_version = 1`)
-		console.log("Updated DB to version 1")
-	}
+    // NOTE: Seed
+    await db.execAsync(`PRAGMA user_version = 1`)
+    console.log("Updated DB to version 1")
+  }
 
-	if (currentDbVersion <= DATABASE_VERSION && currentDbVersion <= 1) {
-		console.log("run version 1 code")
-		await db.withExclusiveTransactionAsync(async (txn) => {
-			let createResult = await createHeadWord(txn, { content: "recallable" })
-			// let deleteResult = await deleteHeadWord(txn, { content: "recallable" })
-			console.log(createResult)
-		})
-	}
-	// await db.execAsync(`PRAGMA user_version = 2`)
+  if (currentDbVersion <= DATABASE_VERSION && currentDbVersion <= 1) {
+    await db.withExclusiveTransactionAsync(async (txn) => {
+      try {
+        // let recallableCreateResult = await createHeadWord(txn, { content: "recallable" })
+        // let codeclubCreateResult = await createHeadWord(txn, { content: "codeclub" })
+        // let findAllResult = (await txn.getAllAsync("SELECT * FROM head_words")) as HeadWord[]
+        // console.log("findAllResult", findAllResult)
+        // await
+      } catch (error) {
+        console.log(error)
+      }
+    })
+  }
+  // await db.execAsync(`PRAGMA user_version = 2`)
 }
