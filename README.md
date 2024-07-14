@@ -2,6 +2,11 @@
 
 [![CircleCI](https://circleci.com/gh/infinitered/ignite.svg?style=svg)](https://circleci.com/gh/infinitered/ignite)
 
+## Development notes
+
+- The prettier settings of this project is inside `package.json`.
+- I created `.prettierrc` to make my none-ls work, but it isn't git committed for unknown reason.
+`
 ## The latest and greatest boilerplate for Infinite Red opinions
 
 This is the boilerplate that [Infinite Red](https://infinite.red) uses as a way to test bleeding-edge changes to our React Native stack.
