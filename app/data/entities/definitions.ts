@@ -1,8 +1,10 @@
+import { createId } from "@paralleldrive/cuid2"
 import { DBTimestampBase, TimestampBase } from "./base"
 
 export type DBDefinition = DBTimestampBase & {
   content: string
   language: string
+  source: string | null
   is_verb: number
   is_adjective: number
   is_comparative_adjective: number
@@ -28,6 +30,7 @@ export type DBDefinition = DBTimestampBase & {
 export type Definition = TimestampBase & {
   content: string
   language: string
+  source: string | null
   is_verb: boolean
   is_adjective: boolean
   is_comparative_adjective: boolean
@@ -54,3 +57,37 @@ export type DefinitionCreate = Partial<Definition> & Pick<Definition, "content" 
 export type DefinitionRead = Pick<Definition, "id">
 export type DefinitionUpdate = Partial<Definition> & Pick<Definition, "id">
 export type DefinitionDelete = Pick<Definition, "id">
+
+export const DEFINITIONS_TABLE_NAME = "definitions"
+
+export const DEFINITIONS_DDL = `
+  CREATE TABLE "${DEFINITIONS_TABLE_NAME}" (
+    "id" TEXT PRIMARY KEY NOT NULL,
+    "content" TEXT NOT NULL,
+    "language" TEXT NOT NULL,
+    "source" TEXT DEFAULT 'recallable',
+    "is_verb" BOOLEAN DEFAULT FALSE,
+    "is_adjective" BOOLEAN DEFAULT FALSE,
+    "is_comparative_adjective" BOOLEAN DEFAULT FALSE,
+    "is_superlative_adjective" BOOLEAN DEFAULT FALSE,
+    "is_countable_noun" BOOLEAN DEFAULT FALSE,
+    "is_uncountable_noun" BOOLEAN DEFAULT FALSE,
+    "is_singular_noun" BOOLEAN DEFAULT FALSE,
+    "is_plural_noun" BOOLEAN DEFAULT FALSE,
+    "is_transitive_verb" BOOLEAN DEFAULT FALSE,
+    "is_intransitive_verb" BOOLEAN DEFAULT FALSE,
+    "is_adverb" BOOLEAN DEFAULT FALSE,
+    "is_conjunction" BOOLEAN DEFAULT FALSE,
+    "is_determiner" BOOLEAN DEFAULT FALSE,
+    "is_preposition" BOOLEAN DEFAULT FALSE,
+    "is_predeterminer" BOOLEAN DEFAULT FALSE,
+    "is_pronoun" BOOLEAN DEFAULT FALSE,
+    "is_prefix" BOOLEAN DEFAULT FALSE,
+    "is_sufffix" BOOLEAN DEFAULT FALSE,
+    "is_exclamation" BOOLEAN DEFAULT FALSE,
+    "is_interjection" BOOLEAN DEFAULT FALSE,
+    "created_at" DATETIME NOT NULL DEFAULT (STRFTIME('%FT%R:%fZ','NOW')),
+    "updated_at" DATETIME NOT NULL DEFAULT (STRFTIME('%FT%R:%fZ','NOW')),
+    "deleted_at" DATETIME
+  )
+`
