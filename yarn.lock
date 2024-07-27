@@ -8802,6 +8802,11 @@ scheduler@^0.23.0:
   dependencies:
     loose-envify "^1.1.0"
 
+seedrandom@^3.0.5:
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/seedrandom/-/seedrandom-3.0.5.tgz#54edc85c95222525b0c7a6f6b3543d8e0b3aa0a7"
+  integrity sha512-8OwmbklUNzwezjGInmZ+2clQmExQPvomqjL7LFqOYqtmuxRgQYqOD3mHaU+MvZn5FLUeVxVfQjwLZW/n/JFuqg==
+
 selfsigned@^2.4.1:
   version "2.4.1"
   resolved "https://registry.yarnpkg.com/selfsigned/-/selfsigned-2.4.1.tgz#560d90565442a3ed35b674034cec4e95dceb4ae0"
@@ -9629,6 +9634,13 @@ trim-right@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/trim-right/-/trim-right-1.0.1.tgz#cb2e1203067e0c8de1f614094b9fe45704ea6003"
   integrity sha512-WZGXGstmCWgeevgTL54hrCuw1dyMQIzWy7ZfqRJfSmJZBwklI15egmQytFP6bPidmw3M8d5yEowl1niq4vmqZw==
+
+ts-fsrs@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/ts-fsrs/-/ts-fsrs-4.0.0.tgz#eb4f59e50efb8fa1454610cf8425307a6f82a15a"
+  integrity sha512-m3J/8c8geDMb0SPd7ta7P0Xlqh3E6d/t9Q/akUtERX4UNz5411VtSmzXENDMUogNVaDKv/FkH7ImrfMdvv9/MA==
+  dependencies:
+    seedrandom "^3.0.5"
 
 ts-interface-checker@^0.1.9:
   version "0.1.13"
