@@ -26,7 +26,7 @@ export class DBStatement {
       INSERT INTO ${this.tableName} (id${hasParams ? ", " : ""}
       ${Object.keys(params).toString()}) 
       VALUES ($id${hasParams ? ", " : ""}
-      ${Object.keys(parseParamsToSqlParams(params)).toString()})
+      ${Object.keys(parseParamsToSqlParams(params))})
 			`
   }
 
@@ -34,7 +34,7 @@ export class DBStatement {
     return `
       UPDATE ${this.tableName} SET 
       (${Object.keys(params).toString()}) = 
-      (${Object.keys(parseParamsToSqlParams(params)).toString()})
+      (${Object.keys(parseParamsToSqlParams(params))})
       WHERE id = $id
 			`
   }
