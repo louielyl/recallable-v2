@@ -33,8 +33,8 @@ export const PARAMETERS_DDL = `
     "w" BLOB NOT NULL,
     "enable_fuzz" INTEGER DEFAULT 0 NOT NULL,
     "enable_short_term" INTEGER DEFAULT 1 NOT NULL,
-    "created_at" DATETIME NOT NULL DEFAULT (DATETIME('NOW')),
-    "updated_at" DATETIME NOT NULL DEFAULT (DATETIME('NOW')),
+    "created_at" DATETIME NOT NULL DEFAULT (STRFTIME('%FT%R:%fZ','NOW')),
+    "updated_at" DATETIME NOT NULL DEFAULT (STRFTIME('%FT%R:%fZ','NOW')),
     "deleted_at" DATETIME
 )`
 

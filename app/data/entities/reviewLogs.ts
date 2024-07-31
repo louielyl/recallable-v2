@@ -48,8 +48,8 @@ export const REVIEW_LOGS_DDL = `
     "last_elapsed_days" INTEGER NOT NULL,
     "scheduled_days" INTEGER NOT NULL,
     "review" DATETIME NOT NULL,
-    "created_at" DATETIME NOT NULL DEFAULT (DATETIME('NOW')),
-    "updated_at" DATETIME NOT NULL DEFAULT (DATETIME('NOW')),
+    "created_at" DATETIME NOT NULL DEFAULT (STRFTIME('%FT%R:%fZ','NOW')),
+    "updated_at" DATETIME NOT NULL DEFAULT (STRFTIME('%FT%R:%fZ','NOW')),
     "deleted_at" DATETIME,
     FOREIGN KEY(head_word_id) REFERENCES ${HEAD_WORDS_TABLE_NAME}(id)
 )`

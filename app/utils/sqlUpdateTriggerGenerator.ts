@@ -5,7 +5,7 @@ export function getUpdateTriggerStatement(table: string) {
     CREATE TRIGGER ${table}_updated_at_trigger_${createId()}
     AFTER UPDATE on ${table}
     BEGIN
-      UPDATE ${table} SET updated_at = DATETIME('NOW') WHERE id = NEW.id;
+      UPDATE ${table} SET updated_at = STRFTIME('%FT%R:%fZ','NOW') WHERE id = NEW.id;
     END
   `
 }

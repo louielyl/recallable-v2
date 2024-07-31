@@ -23,8 +23,8 @@ export const HEAD_WORDS_DDL = `
     "id" TEXT PRIMARY KEY NOT NULL,
     "content" TEXT NOT NULL,
     "source" TEXT DEFAULT 'recallable',
-    "created_at" DATETIME NOT NULL DEFAULT (DATETIME('NOW')),
-    "updated_at" DATETIME NOT NULL DEFAULT (DATETIME('NOW')),
+    "created_at" DATETIME NOT NULL DEFAULT (STRFTIME('%FT%R:%fZ','NOW')),
+    "updated_at" DATETIME NOT NULL DEFAULT (STRFTIME('%FT%R:%fZ','NOW')),
     "deleted_at" DATETIME,
     CONSTRAINT "UQ_${createId()}" UNIQUE ("content")
   )
