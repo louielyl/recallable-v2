@@ -7,7 +7,7 @@ import { Icon } from "../components"
 import { translate } from "../i18n"
 import { colors, spacing, typography } from "../theme"
 import { AppStackParamList, AppStackScreenProps } from "./AppNavigator"
-import { ReviewScreen } from "app/screens/ReviewScreen"
+import { ReviewScreen } from "app/screens/ReviewScreen/ReviewScreen"
 import { CollectionScreen } from "app/screens/CollectionScreen"
 import { DemoShowroomScreen } from "app/screens"
 
