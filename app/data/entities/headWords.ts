@@ -11,6 +11,8 @@ export type HeadWord = TimestampBase & {
   source: string | null
 }
 
+export type HeadWordFindResult = HeadWord & { is_learning: boolean }
+
 export type HeadWordCreate = Partial<HeadWord> & Pick<HeadWord, "content">
 export type HeadWordRead = Partial<Pick<HeadWord, "id" | "content">>
 export type HeadWordUpdate = Partial<HeadWord> & Pick<HeadWord, "id">
