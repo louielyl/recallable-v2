@@ -20,6 +20,7 @@ import { useStores } from "../models"
 import { AppTabParamList, DemoNavigator } from "./DemoNavigator"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { colors } from "app/theme"
+import { useRefetchOnAppFocus } from "app/hooks/useRefetchOnAppFocus"
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -88,10 +89,11 @@ const AppStack = observer(function AppStack() {
 })
 
 export interface NavigationProps
-  extends Partial<React.ComponentProps<typeof NavigationContainer>> { }
+  extends Partial<React.ComponentProps<typeof NavigationContainer>> {}
 
 export const AppNavigator = observer(function AppNavigator(props: NavigationProps) {
   const colorScheme = useColorScheme()
+  useRefetchOnAppFocus()
 
   useBackButtonHandler((routeName) => exitRoutes.includes(routeName))
 
