@@ -42,7 +42,7 @@ export type CardCreate = Partial<Card> & Pick<Card, "head_word_id">
 export type CardSchedule = { currentCard: Card; rating: Grade }
 export type CardRead = Pick<HeadWord, "content">
 export type CardUpdate = Partial<Card> & Pick<Card, "id">
-export type CardDelete = Pick<Card, "id">
+export type CardDelete = Partial<Pick<Card, "id" | "head_word_id">>
 
 export const CARDS_TABLE_NAME = "cards"
 

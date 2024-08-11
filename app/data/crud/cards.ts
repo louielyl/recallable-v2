@@ -16,9 +16,8 @@ import { FSRS, RecordLogItem, createEmptyCard } from "ts-fsrs"
 import { getHeadWord } from "./headWords"
 import { getParameters } from "./parameters"
 import { createReviewLog } from "./reviewLogs"
-import { HEAD_WORDS_TABLE_NAME, HeadWord } from "../entities/headWords"
-import { HEAD_WORD_DEFINITION_MAPPINGS_TABLE_NAME } from "../entities/headWordDefinitionMappings"
-import { DEFINITIONS_TABLE_NAME, Definition } from "../entities/definitions"
+import { HeadWord } from "../entities/headWords"
+import { Definition } from "../entities/definitions"
 import { definitionStatementGeneartor } from "./definitions"
 
 class CardStatement extends DBStatement {
@@ -138,6 +137,15 @@ export async function updateCard(db: DBAPI, { id, ...params }: CardUpdate): Prom
   }) as Promise<DBCard>
 }
 
-export async function deleteCard(db: DBAPI, { id }: CardDelete) {
-  return db.run(cardStatementGenerator.getDeleteStatement(), { $id: id })
+export async function deleteCard(db: DBAPI, { id, head_word_id }: CardDelete) {
+  if (id) {
+    return db.run(cardStatementGenerator.getDeleteStatement(), { $id: id })
+  }
+  if (head_word_id) {
+    const card = await db.get(cardStatementGenerator.getSelectByHeadWordId(), {
+      $head_word_id: head_word_id,
+    })
+    return db.run(cardStatementGenerator.getDeleteStatement(), { $id: card.id })
+  }
+  throw new Error("This shouldn't happen")
 }
