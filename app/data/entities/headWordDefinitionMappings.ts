@@ -1,23 +1,18 @@
 import { DBTimestampBase, TimestampBase } from "entities/base"
-import { DBHeadWord, HeadWord } from "entities/headWord"
-import { DBDefinition, DEFINITIONS_TABLE_NAME } from "./definitions"
+import { HeadWord } from "entities/headWords"
+import { DEFINITIONS_TABLE_NAME } from "./definitions"
 import { HEAD_WORDS_TABLE_NAME } from "./headWords"
 
 export type DBHeadWordDefinitionMapping = DBTimestampBase & {
   head_word_id: string
   definition_id: string
-}
-
-export type DBHeadWordDefinitionMappingFind = DBTimestampBase & {
-  head_word_id: string
-  definition_id: string
-  head_word: DBHeadWord
-  definitions: DBDefinition[]
+  order: number
 }
 
 export type HeadWordDefinitionMapping = TimestampBase & {
   head_word_id: string
   definition_id: string
+  order: number
 }
 
 export type HeadWordDefinitionMappingCreate = Partial<HeadWordDefinitionMapping> &
@@ -34,6 +29,7 @@ export const HEAD_WORD_DEFINITION_MAPPINGS_DDL = `
     "id" TEXT PRIMARY KEY NOT NULL,
     "head_word_id" TEXT NOT NULL,
     "definition_id" TEXT NOT NULL,
+    "order" INT NOT NULL DEFAULT 0,
     "created_at" DATETIME NOT NULL DEFAULT (DATETIME('NOW')),
     "updated_at" DATETIME NOT NULL DEFAULT (DATETIME('NOW')),
     "deleted_at" DATETIME,
