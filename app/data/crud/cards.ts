@@ -28,7 +28,7 @@ class CardStatement extends DBStatement {
     return `
       SELECT * from ${this.tableName}
       WHERE date('now') >= date(due)
-      ORDER BY due DESC
+      ORDER BY due ASC
     `
   }
   getSelectByHeadWordId() {
@@ -60,6 +60,16 @@ function dbCardToCard(input: DBCard): Card {
   }, {} as Card)
 }
 
+function scheduledCardToFSRSCard(input: ScheduledCard): Card {
+  return Object.entries(input).reduce((acc, [key, value]) => {
+    if (key === "headWord" || key === "definitions") {
+      return acc
+    } else {
+      return { ...acc, [key]: value }
+    }
+  }, {} as Card)
+}
+
 export async function createCard(
   db: DBAPI,
   { id = createId(), ...params }: CardCreate,
@@ -78,7 +88,7 @@ export async function createCard(
   return dbCardToCard(dbCard)
 }
 
-export async function findScheduledCards(db: DBAPI, { }): Promise<ScheduledCard[]> {
+export async function findScheduledCards(db: DBAPI, {}): Promise<ScheduledCard[]> {
   const cards: Card[] = await db.find(cardStatementGenerator.findTodaysCards())
   return Promise.all(
     cards.map(async (card) => {
@@ -100,23 +110,23 @@ export async function getCardByHeadWord(db: DBAPI, { content }: CardRead): Promi
   return dbCardToCard(dbCard)
 }
 
-export async function scheduleCard(
-  db: DBAPI,
-  { currentCard, rating }: CardSchedule,
-): Promise<Card> {
+export async function scheduleCard(db: DBAPI, { card, rating }: CardSchedule): Promise<Card> {
   const parameters = await getParameters(db, {})
   const f: FSRS = new FSRS(parameters)
 
-  const schedulingCard = f.repeat(currentCard, new Date())[rating] as RecordLogItem
-  await createReviewLog(db, { ...schedulingCard.log, head_word_id: currentCard.head_word_id })
+  const schedulingCard = f.repeat(scheduledCardToFSRSCard(card), new Date())[
+    rating
+  ] as RecordLogItem
+
+  await createReviewLog(db, { ...schedulingCard.log, head_word_id: card.head_word_id })
 
   await db.run(cardStatementGenerator.getUpdateStatement({ ...schedulingCard.card }), {
-    $id: currentCard.id,
+    $id: card.id,
     ...parseParamsToSqlParams(schedulingCard.card),
   })
 
   const dbCard = await db.get(cardStatementGenerator.getSelectStatement(), {
-    $id: currentCard.id,
+    $id: card.id,
   })
   return dbCardToCard(dbCard)
 }

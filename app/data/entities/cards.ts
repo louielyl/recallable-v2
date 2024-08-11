@@ -1,4 +1,4 @@
-import { Grade } from "ts-fsrs"
+import { Rating } from "ts-fsrs"
 import { DBTimestampBase, TimestampBase } from "./base"
 import { HEAD_WORDS_TABLE_NAME, HeadWord } from "./headWords"
 import { Definition } from "./definitions"
@@ -39,10 +39,11 @@ export type Card = TimestampBase & {
 export type ScheduledCard = Card & { headWord: HeadWord; definitions: Definition[] }
 
 export type CardCreate = Partial<Card> & Pick<Card, "head_word_id">
-export type CardSchedule = { currentCard: Card; rating: Grade }
+export type CardSchedule = { card: ScheduledCard; rating: Rating }
 export type CardRead = Pick<HeadWord, "content">
 export type CardUpdate = Partial<Card> & Pick<Card, "id">
 export type CardDelete = Partial<Pick<Card, "id" | "head_word_id">>
+export type CardReview = Pick<Card, "id"> & { rating: Rating }
 
 export const CARDS_TABLE_NAME = "cards"
 
