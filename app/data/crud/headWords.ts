@@ -74,15 +74,17 @@ export async function findHeadWords(db: DBAPI): Promise<HeadWordFindResult[]> {
 export async function createHeadWord(
   db: DBAPI,
   { id = createId(), ...params }: HeadWordCreate,
-): Promise<DBHeadWord> {
+): Promise<HeadWord> {
   await db.run(headWordStatementGenerator.getInsertStatement(params), {
     $id: id,
     ...parseParamsToSqlParams(params),
   })
 
-  return db.get(headWordStatementGenerator.getSelectStatement(), {
+  const result = (await db.get(headWordStatementGenerator.getSelectStatement(), {
     $id: id,
-  }) as Promise<DBHeadWord>
+  })) as DBHeadWord
+
+  return dbHeadWordToHeadWord(result)
 }
 
 export async function getHeadWord(db: DBAPI, { id, content }: HeadWordRead): Promise<HeadWord> {
