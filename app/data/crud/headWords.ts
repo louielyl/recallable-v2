@@ -38,50 +38,68 @@ class HeadWordStatement extends DBStatement {
   }
 }
 
-function dbHeadWordToHeadWord(input: DBHeadWord): HeadWordFindResult {
-  return Object.entries(input).reduce((acc, [key, value]) => {
+const headWordStatementGenerator = new HeadWordStatement(HEAD_WORDS_TABLE_NAME)
+
+type DBHeadWordWithLearning = DBHeadWord & { is_learning: number }
+
+// BUG: Tried to use overload and the current way to make the function supports different input/ output type, but failed, need to study how to do it properly in the future.
+function dbHeadWordToHeadWord(
+  input: DBHeadWord | DBHeadWordWithLearning,
+): HeadWordFindResult | HeadWord {
+  const result = Object.entries(input).reduce((acc, [key, value]) => {
     if (Boolean(value) && (key === "created_at" || key === "updated_at" || key === "deleted_at")) {
       return { ...acc, [key]: new Date(value as string) }
     } else if (key === "is_learning") {
-      return { ...acc, [key]: Boolean(value) }
+      return { ...acc, is_learning: Boolean(value) }
     } else {
       return { ...acc, [key]: value }
     }
-  }, {} as HeadWordFindResult)
+  }, {} as HeadWord | HeadWordFindResult)
+  return "is_learning" in result ? (result as HeadWordFindResult) : (result as HeadWord)
 }
 
-const headWord = new HeadWordStatement(HEAD_WORDS_TABLE_NAME)
+export async function findHeadWords(db: DBAPI): Promise<HeadWordFindResult[]> {
+  const result = (await db.find(
+    headWordStatementGenerator.getSelectAllStatement(),
+  )) as DBHeadWordWithLearning[]
+  return result.map((item) => {
+    const itemWithLearning: DBHeadWordWithLearning = {
+      ...item,
+      is_learning: "is_learning" in item ? item.is_learning : 0,
+    }
+    return dbHeadWordToHeadWord(itemWithLearning)
+  }) as HeadWordFindResult[]
+}
 
 export async function createHeadWord(
   db: DBAPI,
   { id = createId(), ...params }: HeadWordCreate,
 ): Promise<DBHeadWord> {
-  await db.run(headWord.getInsertStatement(params), {
+  await db.run(headWordStatementGenerator.getInsertStatement(params), {
     $id: id,
     ...parseParamsToSqlParams(params),
   })
 
-  return db.get(headWord.getSelectStatement(), {
+  return db.get(headWordStatementGenerator.getSelectStatement(), {
     $id: id,
   }) as Promise<DBHeadWord>
 }
 
-export async function findHeadWords(db: DBAPI): Promise<HeadWordFindResult[]> {
-  const result = (await db.find(headWord.getSelectAllStatement())) as DBHeadWord[]
-  return result.map((item) => dbHeadWordToHeadWord(item))
-}
-
-export async function getHeadWord(db: DBAPI, { id, content }: HeadWordRead): Promise<DBHeadWord> {
+export async function getHeadWord(db: DBAPI, { id, content }: HeadWordRead): Promise<HeadWord> {
+  let result
   if (id)
-    return db.get(headWord.getSelectStatement(), {
+    result = (await db.get(headWordStatementGenerator.getSelectStatement(), {
       $id: id,
-    }) as Promise<DBHeadWord>
+    })) as DBHeadWord
 
   if (content)
-    return db.get(headWord.getSelectByContentStatement(), {
+    result = (await db.get(headWordStatementGenerator.getSelectByContentStatement(), {
       $content: content,
-    }) as Promise<DBHeadWord>
+    })) as DBHeadWord
 
+  if (result) {
+    return dbHeadWordToHeadWord(result)
+  }
   throw new Error("Head word not found")
 }
 
@@ -89,29 +107,29 @@ export async function updateHeadWord(
   db: DBAPI,
   { id, ...params }: HeadWordUpdate,
 ): Promise<DBHeadWord> {
-  const record = (await db.get(headWord.getSelectStatement(), {
+  const record = (await db.get(headWordStatementGenerator.getSelectStatement(), {
     $id: id,
   })) as DBHeadWord
 
-  await db.run(headWord.getUpdateStatement(record), {
+  await db.run(headWordStatementGenerator.getUpdateStatement(record), {
     $id: id,
     ...parseParamsToSqlParams(record),
     ...parseParamsToSqlParams(params),
   })
 
-  return db.get(headWord.getSelectStatement(), {
+  return db.get(headWordStatementGenerator.getSelectStatement(), {
     $id: id,
   }) as Promise<DBHeadWord>
 }
 
 export async function deleteHeadWord(db: DBAPI, { id, content }: HeadWordDelete) {
   if (id)
-    return db.run(headWord.getDeleteStatement(), {
+    return db.run(headWordStatementGenerator.getDeleteStatement(), {
       $id: id,
     })
 
   if (content)
-    return db.run(headWord.getDeleteByContentStatement(), {
+    return db.run(headWordStatementGenerator.getDeleteByContentStatement(), {
       $content: content,
     })
 }
