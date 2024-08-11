@@ -1,6 +1,7 @@
 import { Grade } from "ts-fsrs"
 import { DBTimestampBase, TimestampBase } from "./base"
 import { HEAD_WORDS_TABLE_NAME, HeadWord } from "./headWords"
+import { Definition } from "./definitions"
 
 export enum State {
   New = 0,
@@ -34,6 +35,8 @@ export type Card = TimestampBase & {
   state: State // The current state of the card (New, Learning, Review, Relearning)
   last_review?: Date // The most recent review date, if applicable
 }
+
+export type ScheduledCard = Card & { headWord: HeadWord; definitions: Definition[] }
 
 export type CardCreate = Partial<Card> & Pick<Card, "head_word_id">
 export type CardSchedule = { currentCard: Card; rating: Grade }
