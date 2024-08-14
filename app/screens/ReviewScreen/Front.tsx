@@ -1,21 +1,21 @@
 import { FC } from "react"
-import { Button, Screen, Text } from "app/components"
-import { View, ViewStyle } from "react-native"
-import { Rating } from "ts-fsrs"
+import { Screen, Text } from "app/components"
+import { TextStyle, View, ViewStyle } from "react-native"
+import { TouchableOpacity } from "react-native-gesture-handler"
 
 type FrontProps = {
   content: string
-  buttonOnPress: (input: Rating) => void
+  screenOnPress: () => void
 }
-export const Front: FC<FrontProps> = function ReviewScreen({ content, buttonOnPress }) {
+export const Front: FC<FrontProps> = function ReviewScreen({ content, screenOnPress }) {
   return (
     <Screen preset="fixed" safeAreaEdges={["top"]} contentContainerStyle={$screenContainer}>
-      <Text text={content} />
-      <View style={$buttonContainer}>
-        <Button onPress={() => buttonOnPress(Rating.Good)} style={$button} text={"good"} />
-        <Button onPress={() => buttonOnPress(Rating.Hard)} style={$button} text={"hard"} />
-        <Button onPress={() => buttonOnPress(Rating.Again)} style={$button} text={"again"} />
-      </View>
+      <TouchableOpacity style={$onPressContainer} onPress={screenOnPress}>
+        <Text style={$textStyle} text={content} />
+        <View style={$viewStyle}>
+          <Text style={$textStyle} text={"recall its pronunciation & meaning"} />
+        </View>
+      </TouchableOpacity>
     </Screen>
   )
 }
@@ -24,10 +24,15 @@ const $screenContainer: ViewStyle = {
   flex: 1,
 }
 
-const $buttonContainer: ViewStyle = {
-  flexDirection: "row",
+const $viewStyle: ViewStyle = {
+  flex: 1,
+  justifyContent: "center",
 }
 
-const $button: ViewStyle = {
-  flex: 1,
+const $onPressContainer: ViewStyle = {
+  height: "100%",
+}
+
+const $textStyle: TextStyle = {
+  textAlign: "center",
 }
