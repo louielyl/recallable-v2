@@ -7,18 +7,22 @@ import { Rating } from "ts-fsrs"
 import { getReviewLog } from "./reviewLogs"
 import { isAfter } from "date-fns"
 
-const MOCK_DB_NAME = "test.sqlite"
+const MOCK_DB_NAME = ":memory:"
 
 const MOCK_HEAD_WORD_PARAMS = {
   content: "recallable",
 }
 
+const dbSetup = async () => {
+  const dbInstance = await AsyncDatabase.open(MOCK_DB_NAME)
+  const db = new DBAPI(dbInstance)
+  await initDatabase(db)
+  return db
+}
+
 describe("cards", () => {
   it("should create card", async () => {
-    const dbInstance = await AsyncDatabase.open(MOCK_DB_NAME)
-    const db = new DBAPI(dbInstance)
-    await initDatabase(db)
-
+    const db = await dbSetup()
     const headWord = await createHeadWord(db, MOCK_HEAD_WORD_PARAMS)
     const card = await createCard(db, { head_word_id: headWord.id })
 
@@ -26,9 +30,7 @@ describe("cards", () => {
   })
 
   it("should get card", async () => {
-    const dbInstance = await AsyncDatabase.open(MOCK_DB_NAME)
-    const db = new DBAPI(dbInstance)
-    await initDatabase(db)
+    const db = await dbSetup()
 
     const headWord = await createHeadWord(db, MOCK_HEAD_WORD_PARAMS)
     const createdCard = await createCard(db, { head_word_id: headWord.id })
@@ -38,9 +40,7 @@ describe("cards", () => {
   })
 
   it("should schedule new card", async () => {
-    const dbInstance = await AsyncDatabase.open(MOCK_DB_NAME)
-    const db = new DBAPI(dbInstance)
-    await initDatabase(db)
+    const db = await dbSetup()
 
     const headWord = await createHeadWord(db, MOCK_HEAD_WORD_PARAMS)
     const currentCard = await createCard(db, { head_word_id: headWord.id })
