@@ -35,5 +35,5 @@ export const HEAD_WORD_DEFINITION_MAPPINGS_DDL = `
     "deleted_at" DATETIME,
     FOREIGN KEY(head_word_id) REFERENCES ${HEAD_WORDS_TABLE_NAME}(id),
     FOREIGN KEY(definition_id) REFERENCES ${DEFINITIONS_TABLE_NAME}(id)
-  )
+  );
 `

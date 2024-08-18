@@ -28,7 +28,7 @@ class CardStatement extends DBStatement {
     return `
       SELECT * from ${this.tableName}
       WHERE date('now') >= date(due)
-      ORDER BY due ASC
+      ORDER BY due ASC;
     `
   }
   getSelectByHeadWordId() {
@@ -36,7 +36,7 @@ class CardStatement extends DBStatement {
       SELECT * FROM ${this.tableName} 
       WHERE head_word_id = $head_word_id 
       ORDER BY created_at DESC 
-      LIMIT 1
+      LIMIT 1;
     `
   }
 }

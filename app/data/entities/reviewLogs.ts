@@ -52,4 +52,5 @@ export const REVIEW_LOGS_DDL = `
     "updated_at" DATETIME NOT NULL DEFAULT (STRFTIME('%FT%R:%fZ','NOW')),
     "deleted_at" DATETIME,
     FOREIGN KEY(head_word_id) REFERENCES ${HEAD_WORDS_TABLE_NAME}(id)
-)`
+  );
+`

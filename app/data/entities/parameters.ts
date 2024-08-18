@@ -36,11 +36,12 @@ export const PARAMETERS_DDL = `
     "created_at" DATETIME NOT NULL DEFAULT (STRFTIME('%FT%R:%fZ','NOW')),
     "updated_at" DATETIME NOT NULL DEFAULT (STRFTIME('%FT%R:%fZ','NOW')),
     "deleted_at" DATETIME
-)`
+  );
+`
 
 const params: FSRSParameters = generatorParameters()
 
 export const PARAMETERS_SEED_STATEMENT = `
   INSERT INTO ${PARAMETERS_TABLE_NAME} (id, w) 
-  VALUES ('${createId()}', '[${params.w}]')
+  VALUES ('${createId()}', '[${params.w}]');
 `

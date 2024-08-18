@@ -29,5 +29,5 @@ export const HEAD_WORDS_DDL = `
     "updated_at" DATETIME NOT NULL DEFAULT (STRFTIME('%FT%R:%fZ','NOW')),
     "deleted_at" DATETIME,
     CONSTRAINT "UQ_${createId()}" UNIQUE ("content")
-  )
+  );
 `

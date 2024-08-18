@@ -21,24 +21,24 @@ class HeadWordStatement extends DBStatement {
     return `
       SELECT ${this.tableName}.*, CASE WHEN ${CARDS_TABLE_NAME}.head_word_id IS NULL THEN 0 ELSE 1 END AS is_learning 
       FROM ${this.tableName} 
-      LEFT JOIN ${CARDS_TABLE_NAME} ON ${this.tableName}.id = ${CARDS_TABLE_NAME}.head_word_id
+      LEFT JOIN ${CARDS_TABLE_NAME} ON ${this.tableName}.id = ${CARDS_TABLE_NAME}.head_word_id;
     `
   }
   getSelectByContentStatement() {
     return `
-      SELECT * FROM ${this.tableName} WHERE content = $content
+      SELECT * FROM ${this.tableName} WHERE content = $content;
     `
   }
 
   getDeleteByContentStatement() {
     return `
       DELETE FROM ${this.tableName} 
-      WHERE content = $content
+      WHERE content = $content;
     `
   }
 }
 
-const headWordStatementGenerator = new HeadWordStatement(HEAD_WORDS_TABLE_NAME)
+export const headWordStatementGenerator = new HeadWordStatement(HEAD_WORDS_TABLE_NAME)
 
 type DBHeadWordWithLearning = DBHeadWord & { is_learning: number }
 

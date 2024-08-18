@@ -22,7 +22,7 @@ class DefinitionStatement extends DBStatement {
       JOIN ${HEAD_WORD_DEFINITION_MAPPINGS_TABLE_NAME} m ON m.definition_id = d.id
       JOIN ${HEAD_WORDS_TABLE_NAME} h ON h.id = m.head_word_id
       WHERE h.id = '${headWordId}'
-      ORDER BY m.[order] DESC, m.[created_at] DESC
+      ORDER BY m.[order] DESC, m.[created_at] DESC;
     `
   }
 }

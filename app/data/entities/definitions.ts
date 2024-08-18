@@ -1,5 +1,6 @@
 import { createId } from "@paralleldrive/cuid2"
 import { DBTimestampBase, TimestampBase } from "./base"
+import { HeadWord } from "./headWords"
 
 export type DBDefinition = DBTimestampBase & {
   content: string
@@ -57,6 +58,7 @@ export type DefinitionCreate = Partial<Definition> & Pick<Definition, "content" 
 export type DefinitionRead = Pick<Definition, "id">
 export type DefinitionUpdate = Partial<Definition> & Pick<Definition, "id">
 export type DefinitionDelete = Pick<Definition, "id">
+export type HeadWordDefinitionFind = Pick<HeadWord, "content">
 
 export const DEFINITIONS_TABLE_NAME = "definitions"
 
@@ -89,5 +91,5 @@ export const DEFINITIONS_DDL = `
     "created_at" DATETIME NOT NULL DEFAULT (STRFTIME('%FT%R:%fZ','NOW')),
     "updated_at" DATETIME NOT NULL DEFAULT (STRFTIME('%FT%R:%fZ','NOW')),
     "deleted_at" DATETIME
-  )
+  );
 `

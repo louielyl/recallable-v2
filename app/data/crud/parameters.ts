@@ -17,7 +17,7 @@ class ParametersStatement extends DBStatement {
   }
   getLastParametersStatement() {
     return `
-      SELECT * FROM ${PARAMETERS_TABLE_NAME} ORDER BY created_at DESC LIMIT 1
+      SELECT * FROM ${PARAMETERS_TABLE_NAME} ORDER BY created_at DESC LIMIT 1;
     `
   }
 }

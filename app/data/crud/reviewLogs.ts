@@ -17,7 +17,7 @@ class ReviewLogStatement extends DBStatement {
 
   getSelectByHeadWordIdStatement() {
     return `
-      SELECT * FROM ${this.tableName} WHERE head_word_id = $head_word_id
+      SELECT * FROM ${this.tableName} WHERE head_word_id = $head_word_id;
     `
   }
 }
