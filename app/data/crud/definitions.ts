@@ -1,10 +1,12 @@
 import {
   DBDefinition,
   DEFINITIONS_TABLE_NAME,
+  Definition,
   DefinitionCreate,
   DefinitionDelete,
   DefinitionRead,
   DefinitionUpdate,
+  HeadWordDefinitionFind,
 } from "../entities/definitions"
 import { createId } from "@paralleldrive/cuid2"
 import { parseParamsToSqlParams } from "app/utils/sqlParameterParser"
@@ -25,6 +27,26 @@ class DefinitionStatement extends DBStatement {
       ORDER BY m.[order] DESC, m.[created_at] DESC;
     `
   }
+  findDefinitionsByHeadWordContent(headWordContent: string) {
+    return `
+      SELECT d.*, m.[order] from ${this.tableName} d
+      JOIN ${HEAD_WORD_DEFINITION_MAPPINGS_TABLE_NAME} m ON m.definition_id = d.id
+      JOIN ${HEAD_WORDS_TABLE_NAME} h ON h.id = m.head_word_id
+      WHERE h.content = '${headWordContent}'
+      ORDER BY m.[order] DESC, m.[created_at] DESC;
+    `
+  }
+}
+
+function dbDefinitionToDefinition(input: DBDefinition): Definition {
+  const result = Object.entries(input).reduce((acc, [key, value]) => {
+    if (Boolean(value) && (key === "created_at" || key === "updated_at" || key === "deleted_at")) {
+      return { ...acc, [key]: new Date(value as string) }
+    } else {
+      return { ...acc, [key]: value }
+    }
+  }, {} as Definition)
+  return result as Definition
 }
 
 export const definitionStatementGeneartor = new DefinitionStatement(DEFINITIONS_TABLE_NAME)
@@ -74,4 +96,15 @@ export async function updateDefinition(
 
 export async function deleteDefinition(db: DBAPI, { id }: DefinitionDelete) {
   return db.run(definitionStatementGeneartor.getDeleteStatement(), { $id: id })
+}
+
+export async function findDefinitionsByHeadWord(
+  db: DBAPI,
+  { content }: HeadWordDefinitionFind,
+): Promise<Definition[]> {
+  if (!content) return []
+  const dbDefinitions = (await db.find(
+    definitionStatementGeneartor.findDefinitionsByHeadWordContent(content),
+  )) as DBDefinition[]
+  return dbDefinitions.map((dbDefinition) => dbDefinitionToDefinition(dbDefinition))
 }
