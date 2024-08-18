@@ -39,7 +39,7 @@ export type Card = TimestampBase & {
 export type ScheduledCard = Card & { headWord: HeadWord; definitions: Definition[] }
 
 export type CardCreate = Partial<Card> & Pick<Card, "head_word_id">
-export type CardSchedule = { card: ScheduledCard; rating: Rating }
+export type CardSchedule = { card: Card; rating: Rating }
 export type CardRead = Pick<HeadWord, "content">
 export type CardUpdate = Partial<Card> & Pick<Card, "id">
 export type CardDelete = Partial<Pick<Card, "id" | "head_word_id">>

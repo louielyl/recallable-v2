@@ -114,9 +114,7 @@ export async function scheduleCard(db: DBAPI, { card, rating }: CardSchedule): P
   const parameters = await getParameters(db, {})
   const f: FSRS = new FSRS(parameters)
 
-  const schedulingCard = f.repeat(scheduledCardToFSRSCard(card), new Date())[
-    rating
-  ] as RecordLogItem
+  const schedulingCard = f.repeat(card, new Date())[rating] as RecordLogItem
 
   await createReviewLog(db, { ...schedulingCard.log, head_word_id: card.head_word_id })
 

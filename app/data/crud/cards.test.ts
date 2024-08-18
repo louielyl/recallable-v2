@@ -44,7 +44,7 @@ describe("cards", () => {
 
     const headWord = await createHeadWord(db, MOCK_HEAD_WORD_PARAMS)
     const currentCard = await createCard(db, { head_word_id: headWord.id })
-    const newCard = await scheduleCard(db, { currentCard, rating: Rating.Hard })
+    const newCard = await scheduleCard(db, { card: currentCard, rating: Rating.Hard })
     const reviewLog = await getReviewLog(db, { head_word_id: headWord.id })
 
     expect(isAfter(newCard.due, currentCard.due)).toBeTruthy()
