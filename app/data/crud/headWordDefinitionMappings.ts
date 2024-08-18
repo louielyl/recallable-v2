@@ -23,7 +23,7 @@ class HeadWordDefinitionMappingStatement extends DBStatement {
   }
 }
 
-const headWordDefinitionMapping = new HeadWordDefinitionMappingStatement(
+export const headWordDefinitionMapping = new HeadWordDefinitionMappingStatement(
   HEAD_WORD_DEFINITION_MAPPINGS_TABLE_NAME,
 )
 
@@ -44,10 +44,10 @@ export async function createHeadWordDefinitionMapping(
 export async function findHeadWordDefinitionMappingsByHeadWord(
   db: DBAPI,
   params: HeadWordDefinitionMappingFind,
-): Promise<DBHeadWordDefinitionMapping> {
+): Promise<DBHeadWordDefinitionMapping[]> {
   return db.find(headWordDefinitionMapping.getSelectAllByHeadWordStatement(), {
     ...parseParamsToSqlParams(params),
-  }) as Promise<DBHeadWordDefinitionMapping>
+  }) as Promise<DBHeadWordDefinitionMapping[]>
 }
 
 export async function deleteHeadWordDefinitionMapping(
