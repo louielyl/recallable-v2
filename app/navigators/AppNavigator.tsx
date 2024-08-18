@@ -17,7 +17,7 @@ import { useColorScheme } from "react-native"
 import * as Screens from "app/screens"
 import Config from "../config"
 import { useStores } from "../models"
-import { AppTabParamList, DemoNavigator } from "./DemoNavigator"
+import { AppTabParamList as AppTabParamList, BottomTabNavigator } from "./DemoNavigator"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { colors } from "app/theme"
 import { useRefetchOnAppFocus } from "app/hooks/useRefetchOnAppFocus"
@@ -36,9 +36,8 @@ import { useRefetchOnAppFocus } from "app/hooks/useRefetchOnAppFocus"
  *   https://reactnavigation.org/docs/typescript/#organizing-types
  */
 export type AppStackParamList = {
-  Welcome: undefined
   Login: undefined
-  Demo: NavigatorScreenParams<AppTabParamList>
+  App: NavigatorScreenParams<AppTabParamList>
   // 🔥 Your screens go here
   // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
 }
@@ -68,13 +67,11 @@ const AppStack = observer(function AppStack() {
         headerShown: false,
         navigationBarColor: colors.background,
       }}
-      initialRouteName={isAuthenticated ? "Welcome" : "Login"}
+      initialRouteName={isAuthenticated ? "App" : "Login"}
     >
       {isAuthenticated ? (
         <>
-          <Stack.Screen name="Welcome" component={Screens.WelcomeScreen} />
-
-          <Stack.Screen name="Demo" component={DemoNavigator} />
+          <Stack.Screen name="App" component={BottomTabNavigator} />
         </>
       ) : (
         <>
