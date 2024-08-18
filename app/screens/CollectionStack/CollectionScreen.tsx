@@ -11,13 +11,14 @@ import { useRefetchOnScreenFocus } from "app/hooks/useRefetchOnScreenFocus"
 import { spacing } from "app/theme"
 import { TextInput } from "react-native-gesture-handler"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
+import { cloneDeep } from "lodash"
+import { CommonActions } from "@react-navigation/native"
 
 export function CollectionStack({
   navigation,
 }: NativeStackScreenProps<AppTabParamList, "Collection">) {
   const db = new DBAPI(useSQLiteContext())
   const queryClient = useQueryClient()
-  const invalidateReviewCards = () => queryClient.invalidateQueries({ queryKey: ["find", "card"] })
   const [text, setText] = useState("")
   const { data: headWords, refetch } = useQuery({
     queryKey: ["find", "headword"],
@@ -26,15 +27,17 @@ export function CollectionStack({
   const { mutate: createCardWithExistingHeadWord } = useMutation({
     mutationFn: ({ head_word_id }: { head_word_id: string }) => createCard(db, { head_word_id }),
     onSettled: () => {
-      invalidateReviewCards()
       refetch()
+      invalidateReviewStack()
     },
   })
   const { mutate: createCardWithText } = useMutation({
-    mutationFn: () =>
-      createHeadWord(db, { content: text })
+    mutationFn: () => {
+      if (!text) throw new Error("empty text")
+      return createHeadWord(db, { content: text })
         .then(({ id }) => createCard(db, { head_word_id: id }))
-        .then(invalidateReviewCards),
+        .then(invalidateReviewStack)
+    },
     onSettled: () => {
       refetch()
       setText("")
@@ -44,11 +47,33 @@ export function CollectionStack({
     mutationFn: ({ head_word_id }: { head_word_id: string }) => deleteCard(db, { head_word_id }),
     onSettled: () => {
       refetch()
-      invalidateReviewCards()
+      invalidateReviewStack()
     },
   })
-
   useRefetchOnScreenFocus(refetch)
+
+  const invalidateReviewStack = () => {
+    queryClient.invalidateQueries({ queryKey: ["find", "card"] })
+    navigation.dispatch((state) => {
+      // NOTE: Follow the React Navigation's design and do not modify the state directly
+      const clonedRoutes = cloneDeep(state.routes)
+      // NOTE: Need to preserve current screen, so we will only update the ReviewStack
+      const reviewRoutes = clonedRoutes.find((route) => route.name === "Review")
+      if (reviewRoutes?.state) {
+        reviewRoutes.state = {
+          ...reviewRoutes.state,
+          index: 0,
+        }
+      }
+      // NOTE: Return to first screen (Front)
+      reviewRoutes?.state?.routes.splice(1)
+
+      return CommonActions.reset({
+        ...state,
+        routes: clonedRoutes,
+      })
+    })
+  }
 
   return (
     <Screen preset="fixed" safeAreaEdges={["top"]} contentContainerStyle={$screenContainer}>
