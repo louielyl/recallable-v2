@@ -37,7 +37,7 @@ export function Back({
 
   return (
     <Screen preset="fixed" safeAreaEdges={["top"]} contentContainerStyle={$screenContainer}>
-      <Text text={headWord} />
+      <Text style={{textAlign:"center"}} size="xl" text={headWord} />
       {definitions?.map((definition) => (
         <Text key={definition.id} text={definition.content} />
       ))}
@@ -67,6 +67,7 @@ const $screenContainer: ViewStyle = {
 }
 
 const $buttonContainer: ViewStyle = {
+  alignSelf: "flex-end",
   flexDirection: "row",
 }
 
