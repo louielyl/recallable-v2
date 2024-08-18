@@ -21,20 +21,19 @@ export class DBStatement {
   }
 
   getInsertStatement(params: Record<string, any>) {
-    const hasParams = Object.keys(params).length !== 0
     return `
-      INSERT INTO ${this.tableName} (id${hasParams ? ", " : ""}
-      ${Object.keys(params).toString()}) 
-      VALUES ($id${hasParams ? ", " : ""}
-      ${Object.keys(parseParamsToSqlParams(params))});
+      INSERT INTO ${this.tableName} 
+      (${["id", Object.keys(params)].join(", ")}) 
+      VALUES 
+      (${["$id", Object.keys(parseParamsToSqlParams(params))].join(", ")});
     `
   }
 
   getUpdateStatement(params: Record<string, any>) {
     return `
       UPDATE ${this.tableName} SET 
-      (${Object.keys(params).toString()}) = 
-      (${Object.keys(parseParamsToSqlParams(params))})
+      (${Object.keys(params).join(", ")}) = 
+      (${Object.keys(parseParamsToSqlParams(params)).join(", ")})
       WHERE id = $id;
     `
   }
