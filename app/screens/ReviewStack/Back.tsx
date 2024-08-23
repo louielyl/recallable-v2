@@ -9,6 +9,8 @@ import { DBAPI } from "app/data/crud/base"
 import { CardSchedule } from "app/data/entities/cards"
 import { getCardByHeadWord, scheduleCard } from "app/data/crud/cards"
 import { findDefinitionsByHeadWord } from "app/data/crud/definitions"
+import HeadWordDetail from "../HeadWordDetailScreen/HeadWordDetailScreen"
+import { colors, spacing } from "app/theme"
 import { useEffect } from "react"
 
 export function Back({
@@ -40,11 +42,13 @@ export function Back({
   }, [headWord])
 
   return (
-    <Screen preset="fixed" safeAreaEdges={["top"]} contentContainerStyle={$screenContainer}>
-      <Text style={{textAlign:"center"}} size="xl" text={headWord} />
-      {definitions?.map((definition) => (
-        <Text key={definition.id} text={definition.content} />
-      ))}
+    <Screen preset="fixed" contentContainerStyle={$screenContainer}>
+      <HeadWordDetail
+        headerProps={{ style: { paddingBottom: spacing.sm } }}
+        contentProps={{ style: { flex: 1, backgroundColor: colors.palette.neutral100 } }}
+        headWord={headWord}
+        definitions={definitions}
+      />
       <View style={$buttonContainer}>
         <Button
           onPress={() => mutate({ card: card!, rating: Rating.Good })}

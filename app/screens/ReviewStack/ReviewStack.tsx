@@ -19,7 +19,7 @@ export function ReviewStack() {
         headerShown: false,
       }}
     >
-      <Stack.Screen name="Front" component={Front} />
+      <Stack.Screen name="Front" component={Front} options={{ animation: "slide_from_right" }} />
       <Stack.Screen name="Back" component={Back} />
     </Stack.Navigator>
   )

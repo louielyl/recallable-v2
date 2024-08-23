@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query"
 import { findScheduledCards } from "app/data/crud/cards"
 import { useSQLiteContext } from "expo-sqlite"
 import { DBAPI } from "app/data/crud/base"
+import { colors } from "app/theme"
 import { useEffect } from "react"
 
 export function Front({ navigation }: NativeStackScreenProps<ReviewParamList, "Front">) {
@@ -17,14 +18,14 @@ export function Front({ navigation }: NativeStackScreenProps<ReviewParamList, "F
   })
   const headWord = data?.[0]?.headWord
   useEffect(() => {
-    headWord?.content && navigation.getParent()?.setOptions({ title: headWord.content })
-  }, [headWord?.content])
+    navigation.getParent()?.setOptions({ title: headWord?.content || undefined })
+  }, [headWord])
 
   if (!headWord)
     return (
       <Screen preset="fixed" contentContainerStyle={$screenContainer}>
         <View style={{ flex: 1, justifyContent: "center" }}>
-          <Text style={{ textAlign: "center" }} text="Congratulations!" />
+          <Text style={{ textAlign: "center" }} text="Congratulations!" size="lg" />
           <Text style={{ textAlign: "center" }} text="You have finished the review today!" />
         </View>
       </Screen>
@@ -35,9 +36,9 @@ export function Front({ navigation }: NativeStackScreenProps<ReviewParamList, "F
         style={$onPressContainer}
         onPress={() => navigation.navigate("Back", { headWord: headWord.content! })}
       >
-        <Text style={$textStyle} text={headWord.content!} />
         <View style={$viewStyle}>
-          <Text style={$textStyle} text={"recall its pronunciation & meaning"} />
+          <Text size="md" style={$textStyle} text={"Recall its pronunciation & meaning"} />
+          <Text size="sm" style={$textStyle} text={"Then tap to show the answer"} />
         </View>
       </TouchableOpacity>
     </Screen>
@@ -55,6 +56,7 @@ const $viewStyle: ViewStyle = {
 
 const $onPressContainer: ViewStyle = {
   height: "100%",
+  backgroundColor: colors.palette.neutral100,
 }
 
 const $textStyle: TextStyle = {
