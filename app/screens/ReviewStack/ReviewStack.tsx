@@ -1,7 +1,6 @@
 import React from "react"
 import { Front } from "./Front"
 import { Back } from "./Back"
-import { colors } from "app/theme"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 
 export type ReviewParamList = {
@@ -18,7 +17,6 @@ export function ReviewStack() {
       initialRouteName="Front"
       screenOptions={{
         headerShown: false,
-        navigationBarColor: colors.background,
       }}
     >
       <Stack.Screen name="Front" component={Front} />

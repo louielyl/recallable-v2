@@ -9,6 +9,7 @@ import { DBAPI } from "app/data/crud/base"
 import { CardSchedule } from "app/data/entities/cards"
 import { getCardByHeadWord, scheduleCard } from "app/data/crud/cards"
 import { findDefinitionsByHeadWord } from "app/data/crud/definitions"
+import { useEffect } from "react"
 
 export function Back({
   navigation,
@@ -34,6 +35,9 @@ export function Back({
       navigation.navigate("Front")
     },
   })
+  useEffect(() => {
+    headWord && navigation.getParent()?.setOptions({ title: headWord })
+  }, [headWord])
 
   return (
     <Screen preset="fixed" safeAreaEdges={["top"]} contentContainerStyle={$screenContainer}>

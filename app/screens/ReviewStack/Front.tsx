@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query"
 import { findScheduledCards } from "app/data/crud/cards"
 import { useSQLiteContext } from "expo-sqlite"
 import { DBAPI } from "app/data/crud/base"
+import { useEffect } from "react"
 
 export function Front({ navigation }: NativeStackScreenProps<ReviewParamList, "Front">) {
   const db = new DBAPI(useSQLiteContext())
@@ -15,10 +16,13 @@ export function Front({ navigation }: NativeStackScreenProps<ReviewParamList, "F
     queryFn: () => findScheduledCards(db, {}),
   })
   const headWord = data?.[0]?.headWord
+  useEffect(() => {
+    headWord?.content && navigation.getParent()?.setOptions({ title: headWord.content })
+  }, [headWord?.content])
 
   if (!headWord)
     return (
-      <Screen preset="fixed" safeAreaEdges={["top"]} contentContainerStyle={$screenContainer}>
+      <Screen preset="fixed" contentContainerStyle={$screenContainer}>
         <View style={{ flex: 1, justifyContent: "center" }}>
           <Text style={{ textAlign: "center" }} text="Congratulations!" />
           <Text style={{ textAlign: "center" }} text="You have finished the review today!" />
@@ -26,7 +30,7 @@ export function Front({ navigation }: NativeStackScreenProps<ReviewParamList, "F
       </Screen>
     )
   return (
-    <Screen preset="fixed" safeAreaEdges={["top"]} contentContainerStyle={$screenContainer}>
+    <Screen preset="fixed" contentContainerStyle={$screenContainer}>
       <TouchableOpacity
         style={$onPressContainer}
         onPress={() => navigation.navigate("Back", { headWord: headWord.content! })}
