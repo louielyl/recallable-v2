@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { Icon } from "../components"
 import { translate } from "../i18n"
 import { colors, spacing, typography } from "../theme"
-import { CollectionStack } from "app/screens/CollectionStack/CollectionScreen"
+import { CollectionStack } from "app/screens/CollectionStack/CollectionStack"
 import { ReviewParamList, ReviewStack } from "app/screens/ReviewStack/ReviewStack"
 
 export type AppTabParamList = {
