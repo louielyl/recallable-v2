@@ -1,17 +1,17 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { NavigatorScreenParams } from "@react-navigation/native"
 import React from "react"
-import { TextStyle, View, ViewStyle } from "react-native"
+import { TextStyle, ViewStyle } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { Icon } from "../components"
 import { translate } from "../i18n"
 import { colors, spacing, typography } from "../theme"
-import { CollectionStack } from "app/screens/CollectionStack/CollectionStack"
+import { CollectionParamList, CollectionStack } from "app/screens/CollectionStack/CollectionStack"
 import { ReviewParamList, ReviewStack } from "app/screens/ReviewStack/ReviewStack"
 
 export type AppTabParamList = {
   Review: NavigatorScreenParams<ReviewParamList>
-  Collection: undefined
+  Collection: NavigatorScreenParams<CollectionParamList>
 }
 
 const Tab = createBottomTabNavigator<AppTabParamList>()
