@@ -12,6 +12,7 @@ import { findDefinitionsByHeadWord } from "app/data/crud/definitions"
 import HeadWordDetail from "../HeadWordDetailScreen/HeadWordDetailScreen"
 import { colors, spacing } from "app/theme"
 import { useEffect } from "react"
+import { HeaderBackButton } from "@react-navigation/elements"
 
 export function Back({
   navigation,
@@ -37,9 +38,19 @@ export function Back({
       navigation.navigate("Front")
     },
   })
+
   useEffect(() => {
-    headWord && navigation.getParent()?.setOptions({ title: headWord })
-  }, [headWord])
+    navigation.getParent()?.setOptions({
+      title: headWord,
+      headerLeft: () => (
+        <HeaderBackButton
+          onPress={() => navigation.goBack()}
+          tintColor={colors.tint}
+          labelVisible={false}
+        />
+      ),
+    })
+  })
 
   return (
     <Screen preset="fixed" contentContainerStyle={$screenContainer}>

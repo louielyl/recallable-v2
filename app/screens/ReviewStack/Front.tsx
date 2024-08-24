@@ -9,17 +9,23 @@ import { useSQLiteContext } from "expo-sqlite"
 import { DBAPI } from "app/data/crud/base"
 import { colors } from "app/theme"
 import { useEffect } from "react"
+import { useRefetchOnScreenFocus } from "app/hooks/useRefetchOnScreenFocus"
 
 export function Front({ navigation }: NativeStackScreenProps<ReviewParamList, "Front">) {
   const db = new DBAPI(useSQLiteContext())
-  const { data } = useQuery({
+  const { data, refetch } = useQuery({
     queryKey: ["find", "card"],
     queryFn: () => findScheduledCards(db, {}),
   })
+  useRefetchOnScreenFocus(refetch)
+
   const headWord = data?.[0]?.headWord
+
   useEffect(() => {
-    navigation.getParent()?.setOptions({ title: headWord?.content || undefined })
-  }, [headWord])
+    navigation
+      .getParent()
+      ?.setOptions({ title: headWord?.content || undefined, headerLeft: undefined })
+  })
 
   if (!headWord)
     return (
@@ -30,6 +36,7 @@ export function Front({ navigation }: NativeStackScreenProps<ReviewParamList, "F
         </View>
       </Screen>
     )
+
   return (
     <Screen preset="fixed" contentContainerStyle={$screenContainer}>
       <TouchableOpacity
