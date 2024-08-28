@@ -1,5 +1,5 @@
-import { Button, Screen, Text } from "app/components"
-import { View, ViewStyle } from "react-native"
+import { Button, Screen } from "app/components"
+import { ScrollView, View, ViewStyle } from "react-native"
 import { Rating } from "ts-fsrs"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import { ReviewParamList } from "./ReviewStack"
@@ -8,11 +8,11 @@ import { useSQLiteContext } from "expo-sqlite"
 import { DBAPI } from "app/data/crud/base"
 import { CardSchedule } from "app/data/entities/cards"
 import { getCardByHeadWord, scheduleCard } from "app/data/crud/cards"
-import { findDefinitionsByHeadWord } from "app/data/crud/definitions"
-import HeadWordDetail from "../HeadWordDetailScreen/HeadWordDetailScreen"
 import { colors, spacing } from "app/theme"
 import { useEffect } from "react"
 import { HeaderBackButton } from "@react-navigation/elements"
+import HeadWordDefinitions from "../HeadWordDetailScreen/HeadWordDefinitions"
+import { findHeadWordDefinitionMappingsByHeadWord } from "app/data/crud/headWordDefinitionMappings"
 
 export function Back({
   navigation,
@@ -23,9 +23,9 @@ export function Back({
   const db = new DBAPI(useSQLiteContext())
   const queryClient = useQueryClient()
   const invalidateReviewCards = () => queryClient.invalidateQueries({ queryKey: ["find", "card"] })
-  const { data: definitions } = useQuery({
-    queryKey: ["find", "definitions", headWord],
-    queryFn: () => findDefinitionsByHeadWord(db, { content: headWord }),
+  const { data: mappings } = useQuery({
+    queryKey: ["find", "definition", "mappings", headWord],
+    queryFn: () => findHeadWordDefinitionMappingsByHeadWord(db, { content: headWord }),
   })
   const { data: card } = useQuery({
     queryKey: ["get", "card", "by", "headWord", headWord],
@@ -54,12 +54,21 @@ export function Back({
 
   return (
     <Screen preset="fixed" contentContainerStyle={$screenContainer}>
-      <HeadWordDetail
-        headerProps={{ style: { paddingBottom: spacing.sm } }}
-        contentProps={{ style: { flex: 1, backgroundColor: colors.palette.neutral100 } }}
-        headWord={headWord}
-        definitions={definitions}
-      />
+      <ScrollView
+        style={{
+          flex: 1,
+          backgroundColor: colors.palette.neutral100,
+          gap: spacing.xl,
+        }}
+      >
+        <HeadWordDefinitions
+          isEdit={false}
+          headerProps={{ style: { paddingBottom: spacing.sm } }}
+          contentProps={{ style: { flex: 1, backgroundColor: colors.palette.neutral100 } }}
+          headWord={headWord}
+          mappings={mappings}
+        />
+      </ScrollView>
       <View style={$buttonContainer}>
         <Button
           onPress={() => mutate({ card: card!, rating: Rating.Good })}

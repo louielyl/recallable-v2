@@ -1,22 +1,25 @@
-import React, { useState } from "react"
-import { TextStyle, View, ViewStyle } from "react-native"
-import { Button, Screen, Text } from "../../components"
-import { AppTabParamList } from "../../navigators/DemoNavigator"
+import React, { useEffect, useState } from "react"
+import { TextStyle, TouchableOpacity, ViewStyle } from "react-native"
+import { Button, Screen, Text, TextField } from "../../components"
 import { useSQLiteContext } from "expo-sqlite"
 import { DBAPI } from "app/data/crud/base"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { createHeadWord, findHeadWords } from "app/data/crud/headWords"
 import { createCard, deleteCard } from "app/data/crud/cards"
 import { useRefetchOnScreenFocus } from "app/hooks/useRefetchOnScreenFocus"
-import { spacing } from "app/theme"
-import { TextInput } from "react-native-gesture-handler"
+import { colors, spacing } from "app/theme"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import { cloneDeep } from "lodash"
-import { CommonActions } from "@react-navigation/native"
+import { CommonActions, CompositeScreenProps } from "@react-navigation/native"
+import { CollectionParamList } from "./CollectionStack"
+import { AppTabParamList } from "app/navigators/DemoNavigator"
 
-export function CollectionStack({
+export function CollectionHome({
   navigation,
-}: NativeStackScreenProps<AppTabParamList, "Collection">) {
+}: CompositeScreenProps<
+  NativeStackScreenProps<CollectionParamList, "CollectionHome">,
+  NativeStackScreenProps<AppTabParamList>
+>) {
   const db = new DBAPI(useSQLiteContext())
   const queryClient = useQueryClient()
   const [text, setText] = useState("")
@@ -50,14 +53,21 @@ export function CollectionStack({
       invalidateReviewStack()
     },
   })
+
   useRefetchOnScreenFocus(refetch)
+
+  useEffect(() => {
+    // FIX: Correct type for getParent
+    navigation.getParent()?.setOptions({ title: undefined, headerLeft: undefined })
+  })
 
   const invalidateReviewStack = () => {
     queryClient.invalidateQueries({ queryKey: ["find", "card"] })
-    navigation.dispatch((state) => {
+    navigation.getParent()?.dispatch((state) => {
       // NOTE: Follow the React Navigation's design and do not modify the state directly
       const clonedRoutes = cloneDeep(state.routes)
       // NOTE: Need to preserve current screen, so we will only update the ReviewStack
+      // TODO: Fix route.name type
       const reviewRoutes = clonedRoutes.find((route) => route.name === "Review")
       if (reviewRoutes?.state) {
         reviewRoutes.state = {
@@ -76,9 +86,16 @@ export function CollectionStack({
   }
 
   return (
-    <Screen preset="fixed" safeAreaEdges={["top"]} contentContainerStyle={$screenContainer}>
+    <Screen preset="fixed" contentContainerStyle={$screenContainer}>
       {headWords?.map((headWord) => (
-        <View key={headWord.id} style={$headWordContainer}>
+        <TouchableOpacity
+          onPress={() => {
+            headWord.content &&
+              navigation.navigate("WordDetail", { headWord: headWord.content, isEdit: false })
+          }}
+          key={headWord.id}
+          style={$headWordContainer}
+        >
           <Text style={$headWord} text={headWord.content ?? ""} />
           {!headWord.is_learning ? (
             <Button
@@ -95,12 +112,11 @@ export function CollectionStack({
               text="remove"
             />
           )}
-        </View>
+        </TouchableOpacity>
       ))}
-      <TextInput
+      <TextField
         autoCapitalize="none"
         autoCorrect={false}
-        style={$textInput}
         value={text}
         onChangeText={setText}
         onSubmitEditing={() => createCardWithText()}
@@ -113,25 +129,23 @@ export function CollectionStack({
 
 const $screenContainer: ViewStyle = {
   flex: 1,
+  backgroundColor: colors.palette.neutral100,
 }
 
 const $headWordContainer: TextStyle = {
   flexDirection: "row",
   justifyContent: "space-between",
   alignItems: "center",
+  marginHorizontal: spacing.xs,
 }
 
 const $headWord: TextStyle = {
   flex: 1,
 }
 
-const $textInput: TextStyle = {
-  paddingVertical: 16,
-}
-
 const $button: TextStyle = {
   minHeight: 0,
   paddingVertical: spacing.xxs,
   paddingHorizontal: spacing.xxs,
-  width: spacing.xxl * 2,
+  minWidth: spacing.xxl * 2,
 }
