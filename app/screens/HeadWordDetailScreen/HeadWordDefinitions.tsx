@@ -4,7 +4,7 @@ import { Icon, Text, TextField, Toggle } from "app/components"
 import { Definition, partOfSpeechToAbbreviation } from "app/data/entities/definitions"
 import { HeadWord } from "app/data/entities/headWords"
 import { colors, spacing } from "app/theme"
-import React, { useMemo } from "react"
+import React, { Fragment, useMemo } from "react"
 import {
   ScrollViewProps,
   View,
@@ -192,80 +192,42 @@ export default function HeadWordDefinitions({
               />
             </View>
           ))
+        ) : definitions && definitions?.length > 0 ? (
+          definitions.map((definition) => (
+            <View key={definition.id} style={{ flexDirection: "row" }}>
+              <View style={{ marginHorizontal: spacing.xxs, flex: 1 }}>
+                <View style={{ flexDirection: "row" }}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      flexWrap: "wrap",
+                      gap: spacing.xxs,
+                      marginBottom: spacing.xs,
+                      flex: 1,
+                    }}
+                  >
+                    {Object.entries(partOfSpeechToAbbreviation).map(([key, value]) =>
+                      definition[key as keyof Definition] ? (
+                        <TouchableOpacity key={key} disabled={!isEdit}>
+                          <Text text={value} style={$partOfSpeechLabelSelected} />
+                        </TouchableOpacity>
+                      ) : isEdit ? (
+                        <TouchableOpacity key={key} disabled={!isEdit}>
+                          <Text text={value} style={$partOfSpeechLabel} />
+                        </TouchableOpacity>
+                      ) : (
+                        <Fragment key={key} />
+                      ),
+                    )}
+                  </View>
+                </View>
+                <Text text={definition.content} />
+              </View>
+            </View>
+          ))
         ) : (
           <></>
         )}
-        {/* {definitions && definitions.length > 0 ? ( */}
-        {/*   definitions.map((definition) => ( */}
-        {/*     <View key={definition.id} style={{ flexDirection: "row" }}> */}
-        {/*       <View style={{ marginHorizontal: spacing.xxs, flex: 1 }}> */}
-        {/*         <View style={{ flexDirection: "row" }}> */}
-        {/*           <View */}
-        {/*             style={{ */}
-        {/*               flexDirection: "row", */}
-        {/*               flexWrap: "wrap", */}
-        {/*               gap: spacing.xxs, */}
-        {/*               marginBottom: spacing.xs, */}
-        {/*               flex: 1, */}
-        {/*             }} */}
-        {/*           > */}
-        {/*             {Object.entries(partOfSpeechToAbbreviation).map(([key, value]) => */}
-        {/*               definition[key as keyof Definition] ? ( */}
-        {/*                 <TouchableOpacity key={key} disabled={!isEdit}> */}
-        {/*                   <Text text={value} style={$partOfSpeechLabelSelected} /> */}
-        {/*                 </TouchableOpacity> */}
-        {/*               ) : isEdit ? ( */}
-        {/*                 <TouchableOpacity key={key} disabled={!isEdit}> */}
-        {/*                   <Text text={value} style={$partOfSpeechLabel} /> */}
-        {/*                 </TouchableOpacity> */}
-        {/*               ) : ( */}
-        {/*                 <Fragment key={key} /> */}
-        {/*               ), */}
-        {/*             )} */}
-        {/*           </View> */}
-        {/*           {isEdit ? ( */}
-        {/*             <Icon */}
-        {/*               onPress={() => */}
-        {/*                 Alert.alert( */}
-        {/*                   "Delete Definition?", */}
-        {/*                   "This definition will be permanetly deleted from the app.", */}
-        {/*                   [ */}
-        {/*                     { */}
-        {/*                       text: "Delete", */}
-        {/*                       style: "destructive", */}
-        {/*                       onPress: () => { */}
-        {/*                         deleteHeadWordDefinitionMappingById(definition.mappingId) */}
-        {/*                       }, */}
-        {/*                     }, */}
-        {/*                     { text: "Cancel", style: "cancel", onPress: () => console.log("yoyo") }, */}
-        {/*                   ], */}
-        {/*                 ) */}
-        {/*               } */}
-        {/*               icon="x" */}
-        {/*               size={16} */}
-        {/*               color={colors.textDim} */}
-        {/*             /> */}
-        {/*           ) : ( */}
-        {/*             <></> */}
-        {/*           )} */}
-        {/*         </View> */}
-        {/*         {isEdit ? ( */}
-        {/*           <Controller */}
-        {/*             name="content" */}
-        {/*             control={control} */}
-        {/*             render={({ field: { onChange, value } }) => ( */}
-        {/*               <TextField value={definition.content} multiline={true} /> */}
-        {/*             )} */}
-        {/*           /> */}
-        {/*         ) : ( */}
-        {/*           <Text text={definition.content} /> */}
-        {/*         )} */}
-        {/*       </View> */}
-        {/*     </View> */}
-        {/*   )) */}
-        {/* ) : ( */}
-        {/*   <></> */}
-        {/* )} */}
       </View>
     </View>
   )
