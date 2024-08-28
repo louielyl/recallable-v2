@@ -1,6 +1,6 @@
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { Icon, Text, TextField, Toggle } from "app/components"
+import { Icon, Text, TextField } from "app/components"
 import { Definition, partOfSpeechToAbbreviation } from "app/data/entities/definitions"
 import { HeadWord } from "app/data/entities/headWords"
 import { colors, spacing } from "app/theme"
@@ -13,12 +13,12 @@ import {
   TextStyle,
   Alert,
   TouchableOpacity,
+  ViewStyle,
 } from "react-native"
 import { CollectionParamList } from "../CollectionStack/CollectionStack"
 import { DBHeadWordDefinitionMapping } from "app/data/entities/headWordDefinitionMappings"
 import { useFieldArray, useForm, Controller } from "react-hook-form"
 
-// import { Container } from './styles';
 export type HeadWordDefinitionsProps = {
   isEdit: boolean
   headerProps?: ViewProps
@@ -59,6 +59,18 @@ export default function HeadWordDefinitions({
     }
   }, [])
 
+  const deleteAlert = (index: number) =>
+    Alert.alert("Delete Definition?", "This definition will be permanetly deleted from the app.", [
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: () => {
+          remove(index)
+        },
+      },
+      { text: "Cancel", style: "cancel" },
+    ])
+
   return (
     <View
       style={{
@@ -68,7 +80,7 @@ export default function HeadWordDefinitions({
         backgroundColor: colors.palette.neutral100,
       }}
     >
-      <View style={{ flexDirection: "row", gap: spacing.xxs, marginBottom: spacing.xs }}>
+      <View style={{ flexDirection: "row", gap: spacing.xxs, marginBottom: spacing.sm }}>
         <Text
           text={"Definitions"}
           style={{ textDecorationLine: "underline", flex: 1, color: colors.tint }}
@@ -132,15 +144,7 @@ export default function HeadWordDefinitions({
           fields.map((item, index) => (
             <View key={item.id}>
               <View style={{ flexDirection: "row" }}>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    flexWrap: "wrap",
-                    marginBottom: spacing.xs,
-                    flex: 1,
-                    gap: spacing.xxs,
-                  }}
-                >
+                <View style={$abbreviationContainer}>
                   {Object.entries(partOfSpeechToAbbreviation).map(([key, abbreviation]) => (
                     <Controller
                       key={`${item.id}.${key}`}
@@ -164,26 +168,7 @@ export default function HeadWordDefinitions({
                     />
                   ))}
                 </View>
-                <Icon
-                  onPress={() =>
-                    Alert.alert(
-                      "Delete Definition?",
-                      "This definition will be permanetly deleted from the app.",
-                      [
-                        {
-                          text: "Delete",
-                          style: "destructive",
-                          onPress: () => {
-                            remove(index)
-                          },
-                        },
-                        { text: "Cancel", style: "cancel" },
-                      ],
-                    )
-                  }
-                  icon="x"
-                  size={16}
-                />
+                <Icon onPress={() => deleteAlert(index)} icon="x" size={16} />
               </View>
               <Controller
                 control={control}
@@ -196,31 +181,22 @@ export default function HeadWordDefinitions({
           definitions.map((definition) => (
             <View key={definition.id} style={{ flexDirection: "row" }}>
               <View style={{ marginHorizontal: spacing.xxs, flex: 1 }}>
-                <View style={{ flexDirection: "row" }}>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      flexWrap: "wrap",
-                      gap: spacing.xxs,
-                      marginBottom: spacing.xs,
-                      flex: 1,
-                    }}
-                  >
-                    {Object.entries(partOfSpeechToAbbreviation).map(([key, value]) =>
-                      definition[key as keyof Definition] ? (
-                        <TouchableOpacity key={key} disabled={!isEdit}>
-                          <Text text={value} style={$partOfSpeechLabelSelected} />
-                        </TouchableOpacity>
-                      ) : isEdit ? (
-                        <TouchableOpacity key={key} disabled={!isEdit}>
-                          <Text text={value} style={$partOfSpeechLabel} />
-                        </TouchableOpacity>
-                      ) : (
-                        <Fragment key={key} />
-                      ),
-                    )}
-                  </View>
+                <View style={$abbreviationContainer}>
+                  {Object.entries(partOfSpeechToAbbreviation).map(([key, value]) =>
+                    definition[key as keyof Definition] ? (
+                      <TouchableOpacity key={key} disabled={!isEdit}>
+                        <Text text={value} style={$partOfSpeechLabelSelected} />
+                      </TouchableOpacity>
+                    ) : isEdit ? (
+                      <TouchableOpacity key={key} disabled={!isEdit}>
+                        <Text text={value} style={$partOfSpeechLabel} />
+                      </TouchableOpacity>
+                    ) : (
+                      <Fragment key={key} />
+                    ),
+                  )}
                 </View>
+
                 <Text text={definition.content} />
               </View>
             </View>
@@ -252,4 +228,12 @@ const $partOfSpeechLabelSelected: TextStyle = {
   ...$partOfSpeechLabel,
   color: colors.palette.primary400,
   borderColor: colors.palette.primary400,
+}
+
+const $abbreviationContainer: ViewStyle = {
+  flex: 1,
+  flexDirection: "row",
+  flexWrap: "wrap",
+  gap: spacing.xxs,
+  marginBottom: spacing.xxs,
 }
