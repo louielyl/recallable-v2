@@ -16,8 +16,8 @@ class HeadWordDefinitionMappingStatement extends DBStatement {
   }
   getSelectAllByHeadWordStatement() {
     return `
-      SELECT * FROM ${this.tableName} 
-      JOIN ${HEAD_WORDS_TABLE_NAME} ON ${this.tableName}.head_word_id = ${HEAD_WORDS_TABLE_NAME}.id
+      SELECT m.* FROM ${this.tableName} m
+      JOIN ${HEAD_WORDS_TABLE_NAME} ON m.head_word_id = ${HEAD_WORDS_TABLE_NAME}.id
       WHERE content = $content
     `
   }
