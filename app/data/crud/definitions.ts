@@ -11,8 +11,18 @@ import {
 import { createId } from "@paralleldrive/cuid2"
 import { parseParamsToSqlParams } from "app/utils/sqlParameterParser"
 import { DBAPI, DBStatement } from "./base"
-import { HEAD_WORD_DEFINITION_MAPPINGS_TABLE_NAME } from "../entities/headWordDefinitionMappings"
+import {
+  DBHeadWordDefinitionMapping,
+  HEAD_WORD_DEFINITION_MAPPINGS_TABLE_NAME,
+} from "../entities/headWordDefinitionMappings"
 import { HEAD_WORDS_TABLE_NAME } from "../entities/headWords"
+import {
+  createHeadWordDefinitionMapping,
+  deleteHeadWordDefinitionMapping,
+  findHeadWordDefinitionMappingsByHeadWord,
+  headWordDefinitionMapping,
+} from "./headWordDefinitionMappings"
+import { getHeadWord } from "./headWords"
 
 class DefinitionStatement extends DBStatement {
   constructor(tableName: string) {
@@ -38,7 +48,7 @@ class DefinitionStatement extends DBStatement {
   }
 }
 
-function dbDefinitionToDefinition(input: DBDefinition): Definition {
+export function dbDefinitionToDefinition(input: DBDefinition): Definition {
   const result = Object.entries(input).reduce((acc, [key, value]) => {
     if (Boolean(value) && (key === "created_at" || key === "updated_at" || key === "deleted_at")) {
       return { ...acc, [key]: new Date(value as string) }
@@ -92,6 +102,61 @@ export async function updateDefinition(
   return db.get(definitionStatementGeneartor.getSelectStatement(), {
     $id: id,
   }) as Promise<DBDefinition>
+}
+
+export async function updateDefinitionsWithForm(
+  db: DBAPI,
+  data: { definitions: (Definition & { mappingId: string })[]; headWord: string },
+) {
+  // NOTE: List out current relationships
+  const existingMappings = await findHeadWordDefinitionMappingsByHeadWord(db, {
+    content: data.headWord,
+  })
+  const headWord = await getHeadWord(db, { content: data.headWord })
+  const newDefinitions = data.definitions.filter((definition) => !definition.mappingId)
+  const staleDefinitions = data.definitions.filter((definition) =>
+    existingMappings.map((existingMapping) => existingMapping.id).includes(definition.mappingId),
+  )
+  const removingDefinitions = existingMappings.filter(
+    (existingMapping) =>
+      !data.definitions.map((definition) => definition.mappingId).includes(existingMapping.id),
+  )
+  // NOTE: Create new definitions
+  try {
+    await Promise.all(
+      newDefinitions
+        .map((newDefinition) =>
+          Object.fromEntries(
+            Object.entries(newDefinition).filter(([_, value]) => value !== undefined),
+          ),
+        )
+        .map(async (newDefinition) => {
+          const definition = await createDefinition(db, {
+            ...newDefinition,
+          })
+          return createHeadWordDefinitionMapping(db, {
+            head_word_id: headWord.id,
+            definition_id: definition.id,
+          })
+        }),
+    )
+
+    // NOTE: Clean up removing definitions
+    await Promise.all(
+      removingDefinitions.map(async (removingDefinition) =>
+        deleteHeadWordDefinitionMapping(db, { id: removingDefinition.id }),
+      ),
+    )
+
+    // NOTE: Update stale definitions
+    await Promise.all(
+      staleDefinitions.map(async ({ mappingId, ...staleDefinition }) =>
+        updateDefinition(db, { ...staleDefinition }),
+      ),
+    )
+  } catch (e) {
+    console.log(e)
+  }
 }
 
 export async function deleteDefinition(db: DBAPI, { id }: DefinitionDelete) {
