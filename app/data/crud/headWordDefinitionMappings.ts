@@ -9,6 +9,8 @@ import { createId } from "@paralleldrive/cuid2"
 import { parseParamsToSqlParams } from "app/utils/sqlParameterParser"
 import { DBAPI, DBStatement } from "./base"
 import { HEAD_WORDS_TABLE_NAME } from "../entities/headWords"
+import { DBDefinition, Definition } from "../entities/definitions"
+import { dbDefinitionToDefinition, definitionStatementGeneartor } from "./definitions"
 
 class HeadWordDefinitionMappingStatement extends DBStatement {
   constructor(tableName: string) {
@@ -44,10 +46,20 @@ export async function createHeadWordDefinitionMapping(
 export async function findHeadWordDefinitionMappingsByHeadWord(
   db: DBAPI,
   params: HeadWordDefinitionMappingFind,
-): Promise<DBHeadWordDefinitionMapping[]> {
-  return db.find(headWordDefinitionMapping.getSelectAllByHeadWordStatement(), {
+): Promise<(DBHeadWordDefinitionMapping & { definition: Definition })[]> {
+  const mappings = (await db.find(headWordDefinitionMapping.getSelectAllByHeadWordStatement(), {
     ...parseParamsToSqlParams(params),
-  }) as Promise<DBHeadWordDefinitionMapping[]>
+  })) as DBHeadWordDefinitionMapping[]
+  return Promise.all(
+    mappings.map(async (mapping) => {
+      const dbDefinition: DBDefinition = await db.get(
+        definitionStatementGeneartor.getSelectStatement(),
+        { $id: mapping.definition_id },
+      )
+      const definition = dbDefinitionToDefinition(dbDefinition)
+      return { ...mapping, definition }
+    }),
+  )
 }
 
 export async function deleteHeadWordDefinitionMapping(
