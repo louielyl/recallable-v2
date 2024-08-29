@@ -3,11 +3,11 @@ import { NavigatorScreenParams } from "@react-navigation/native"
 import React from "react"
 import { TextStyle, ViewStyle } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { Icon } from "../components"
 import { translate } from "../i18n"
 import { colors, spacing, typography } from "../theme"
 import { CollectionParamList, CollectionStack } from "app/screens/CollectionStack/CollectionStack"
 import { ReviewParamList, ReviewStack } from "app/screens/ReviewStack/ReviewStack"
+import { Feather } from "@expo/vector-icons"
 
 export type AppTabParamList = {
   Review: NavigatorScreenParams<ReviewParamList>
@@ -43,7 +43,7 @@ export function BottomTabNavigator() {
         options={{
           tabBarLabel: translate("appNavigator.review"),
           tabBarIcon: ({ focused }) => (
-            <Icon icon="components" color={focused ? colors.tint : undefined} size={30} />
+            <Feather name="book-open" color={focused ? colors.tint : undefined} size={spacing.xl} />
           ),
         }}
       />
@@ -53,7 +53,7 @@ export function BottomTabNavigator() {
         options={{
           tabBarLabel: translate("appNavigator.collection"),
           tabBarIcon: ({ focused }) => (
-            <Icon icon="components" color={focused ? colors.tint : undefined} size={30} />
+            <Feather name="book" color={focused ? colors.tint : undefined} size={spacing.xl} />
           ),
         }}
       />
