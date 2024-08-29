@@ -30,7 +30,9 @@ export function Front({ navigation }: NativeStackScreenProps<ReviewParamList, "F
   if (!headWord)
     return (
       <Screen preset="fixed" contentContainerStyle={$screenContainer}>
-        <View style={{ flex: 1, justifyContent: "center" }}>
+        <View
+          style={{ flex: 1, justifyContent: "center", backgroundColor: colors.palette.neutral100 }}
+        >
           <Text style={{ textAlign: "center" }} text="Congratulations!" size="lg" />
           <Text style={{ textAlign: "center" }} text="You have finished the review today!" />
         </View>
