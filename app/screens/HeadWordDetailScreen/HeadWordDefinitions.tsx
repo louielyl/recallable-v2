@@ -18,7 +18,9 @@ import {
 import { CollectionParamList } from "../CollectionStack/CollectionStack"
 import { DBHeadWordDefinitionMapping } from "app/data/entities/headWordDefinitionMappings"
 import { useFieldArray, useForm, Controller } from "react-hook-form"
+import Animated, { FadeIn, FadeOut, LinearTransition } from "react-native-reanimated"
 
+// import { Container } from './styles';
 export type HeadWordDefinitionsProps = {
   isEdit: boolean
   headerProps?: ViewProps
@@ -82,7 +84,7 @@ export default function HeadWordDefinitions({
     >
       <View style={{ flexDirection: "row", gap: spacing.xxs, marginBottom: spacing.sm }}>
         <Text
-          text={"Definitions"}
+          text={isEdit ? "Edit Definitions" : "Definitions"}
           style={{ textDecorationLine: "underline", flex: 1, color: colors.tint }}
           preset="formLabel"
         />
@@ -139,10 +141,15 @@ export default function HeadWordDefinitions({
           />
         )}
       </View>
-      <View style={{ gap: spacing.sm }}>
+      <View style={{ gap: spacing.sm, paddingBottom: spacing.md }}>
         {isEdit ? (
           fields.map((item, index) => (
-            <View key={item.id}>
+            <Animated.View
+              key={item.id}
+              entering={FadeIn}
+              exiting={FadeOut}
+              layout={LinearTransition}
+            >
               <View style={{ flexDirection: "row" }}>
                 <View style={$abbreviationContainer}>
                   {Object.entries(partOfSpeechToAbbreviation).map(([key, abbreviation]) => (
@@ -173,13 +180,21 @@ export default function HeadWordDefinitions({
               <Controller
                 control={control}
                 name={`definitions.${index}.content`}
-                render={({ field }) => <TextField onChangeText={field.onChange} {...field} />}
+                render={({ field }) => (
+                  <TextField multiline onChangeText={field.onChange} {...field} />
+                )}
               />
-            </View>
+            </Animated.View>
           ))
         ) : definitions && definitions?.length > 0 ? (
           definitions.map((definition) => (
-            <View key={definition.id} style={{ flexDirection: "row" }}>
+            <Animated.View
+              key={definition.id}
+              style={{ flexDirection: "row" }}
+              entering={FadeIn}
+              exiting={FadeOut}
+              layout={LinearTransition}
+            >
               <View style={{ marginHorizontal: spacing.xxs, flex: 1 }}>
                 <View style={$abbreviationContainer}>
                   {Object.entries(partOfSpeechToAbbreviation).map(([key, value]) =>
@@ -196,10 +211,9 @@ export default function HeadWordDefinitions({
                     ),
                   )}
                 </View>
-
                 <Text text={definition.content} />
               </View>
-            </View>
+            </Animated.View>
           ))
         ) : (
           <></>
