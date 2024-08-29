@@ -4,7 +4,7 @@ import { Icon, Text, TextField } from "app/components"
 import { Definition, partOfSpeechToAbbreviation } from "app/data/entities/definitions"
 import { HeadWord } from "app/data/entities/headWords"
 import { colors, spacing } from "app/theme"
-import React, { Fragment, useMemo } from "react"
+import React, { Fragment, useEffect, useLayoutEffect, useMemo } from "react"
 import {
   ScrollViewProps,
   View,
@@ -18,7 +18,13 @@ import {
 import { CollectionParamList } from "../CollectionStack/CollectionStack"
 import { DBHeadWordDefinitionMapping } from "app/data/entities/headWordDefinitionMappings"
 import { useFieldArray, useForm, Controller } from "react-hook-form"
-import Animated, { FadeIn, FadeOut, LinearTransition } from "react-native-reanimated"
+import Animated, {
+  FadeIn,
+  FadeOut,
+  LinearTransition,
+  RotateOutDownRight,
+} from "react-native-reanimated"
+import { Entypo, Feather, FontAwesome } from "@expo/vector-icons"
 
 // import { Container } from './styles';
 export type HeadWordDefinitionsProps = {
@@ -41,7 +47,13 @@ export default function HeadWordDefinitions({
     () => mappings?.map((mapping) => ({ ...mapping.definition, mappingId: mapping.id })),
     [mappings],
   )
-  const { control, handleSubmit, reset, setValue } = useForm<{
+  const {
+    control,
+    handleSubmit,
+    reset,
+    setValue,
+    formState: { isDirty },
+  } = useForm<{
     definitions: Partial<Definition & { mappingId: string }>[]
   }>({
     defaultValues: { definitions: [] },
@@ -50,12 +62,10 @@ export default function HeadWordDefinitions({
     definitions: Partial<Definition & { mappingId: string }>[]
   }>({ control, name: "definitions" })
   const onSubmit = (data: any) => updateDefinitions && updateDefinitions(data)
-
-  React.useEffect(() => {
+  useEffect(() => {
     definitions && reset({ definitions })
   }, [definitions])
-
-  React.useLayoutEffect(() => {
+  useLayoutEffect(() => {
     return () => {
       isEdit && handleSubmit(onSubmit)()
     }
@@ -72,6 +82,53 @@ export default function HeadWordDefinitions({
       },
       { text: "Cancel", style: "cancel" },
     ])
+  const discardAlert = (_: number) =>
+    Alert.alert("Undo Changes?", "This will undo the changes you just did.", [
+      {
+        text: "Undo",
+        style: "destructive",
+        onPress: () => {
+          reset({ definitions })
+        },
+      },
+      { text: "Cancel", style: "cancel" },
+    ])
+  const addNewDefinition = () =>
+    append({
+      content: "",
+      created_at: undefined,
+      deleted_at: null,
+      id: undefined,
+      is_adjective: undefined,
+      is_adverb: undefined,
+      is_comparative_adjective: undefined,
+      is_conjunction: undefined,
+      is_countable_noun: undefined,
+      is_determiner: undefined,
+      is_exclamation: undefined,
+      is_interjection: undefined,
+      is_intransitive_verb: undefined,
+      is_noun: undefined,
+      is_plural_noun: undefined,
+      is_predeterminer: undefined,
+      is_prefix: undefined,
+      is_preposition: undefined,
+      is_pronoun: undefined,
+      is_singular_noun: undefined,
+      is_sufffix: undefined,
+      is_superlative_adjective: undefined,
+      is_transitive_verb: undefined,
+      is_uncountable_noun: undefined,
+      is_verb: undefined,
+      // TODO: Make default values dynamic
+      language: "english",
+      source: "user",
+      updated_at: undefined,
+      mappingId: undefined,
+    })
+
+  const navigateToEdit = () =>
+    navigation.navigate("WordDetailEdit", { headWord: headWord!, isEdit: true })
 
   return (
     <View
@@ -90,55 +147,27 @@ export default function HeadWordDefinitions({
         />
         {isEdit ? (
           <>
-            <Icon
-              icon="more"
-              onPress={() =>
-                append({
-                  content: "",
-                  created_at: undefined,
-                  deleted_at: null,
-                  id: undefined,
-                  is_adjective: undefined,
-                  is_adverb: undefined,
-                  is_comparative_adjective: undefined,
-                  is_conjunction: undefined,
-                  is_countable_noun: undefined,
-                  is_determiner: undefined,
-                  is_exclamation: undefined,
-                  is_interjection: undefined,
-                  is_intransitive_verb: undefined,
-                  is_noun: undefined,
-                  is_plural_noun: undefined,
-                  is_predeterminer: undefined,
-                  is_prefix: undefined,
-                  is_preposition: undefined,
-                  is_pronoun: undefined,
-                  is_singular_noun: undefined,
-                  is_sufffix: undefined,
-                  is_superlative_adjective: undefined,
-                  is_transitive_verb: undefined,
-                  is_uncountable_noun: undefined,
-                  is_verb: undefined,
-                  // TODO: Make default values dynamic
-                  language: "english",
-                  source: "user",
-                  updated_at: undefined,
-                  mappingId: undefined,
-                })
-              }
-              color={colors.tint}
-              size={spacing.md}
-            />
+            {isDirty ? (
+              <Animated.View
+                style={{ alignSelf: "center" }}
+                entering={FadeIn}
+                exiting={RotateOutDownRight}
+              >
+                <TouchableOpacity onPress={discardAlert}>
+                  <FontAwesome name="undo" size={spacing.md} color={colors.tint} />
+                </TouchableOpacity>
+              </Animated.View>
+            ) : (
+              <></>
+            )}
+            <TouchableOpacity style={{ alignSelf: "center" }} onPress={addNewDefinition}>
+              <Entypo name="plus" size={spacing.lg} color={colors.tint} />
+            </TouchableOpacity>
           </>
         ) : (
-          <Icon
-            onPress={() =>
-              navigation.navigate("WordDetailEdit", { headWord: headWord!, isEdit: true })
-            }
-            icon="settings"
-            color={colors.tint}
-            size={spacing.md}
-          />
+          <TouchableOpacity onPress={navigateToEdit}>
+            <Feather name="edit-3" color={colors.tint} size={spacing.md} />
+          </TouchableOpacity>
         )}
       </View>
       <View style={{ gap: spacing.sm, paddingBottom: spacing.md }}>
@@ -150,7 +179,7 @@ export default function HeadWordDefinitions({
               exiting={FadeOut}
               layout={LinearTransition}
             >
-              <View style={{ flexDirection: "row" }}>
+              <View style={{ flexDirection: "row", marginBottom: spacing.xxs }}>
                 <View style={$abbreviationContainer}>
                   {Object.entries(partOfSpeechToAbbreviation).map(([key, abbreviation]) => (
                     <Controller
@@ -175,7 +204,9 @@ export default function HeadWordDefinitions({
                     />
                   ))}
                 </View>
-                <Icon onPress={() => deleteAlert(index)} icon="x" size={16} />
+                <TouchableOpacity onPress={() => deleteAlert(index)}>
+                  <Entypo name="cross" size={spacing.md} color={colors.textDim} />
+                </TouchableOpacity>
               </View>
               <Controller
                 control={control}
