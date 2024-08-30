@@ -25,7 +25,7 @@ export function CollectionStack() {
         <Stack.Screen
           name="CollectionHome"
           component={CollectionHome}
-          options={{ animation: "slide_from_right" }}
+          options={{ animation: Platform.select({ ios: "slide_from_right" }) }}
         />
         <Stack.Screen name="WordDetail" component={CollectionWordDetail} />
       </Stack.Group>

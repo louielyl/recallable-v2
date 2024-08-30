@@ -22,7 +22,11 @@ export function ReviewStack() {
         headerShown: false,
       }}
     >
-      <Stack.Screen name="Front" component={Front} options={{ animation: "slide_from_right" }} />
+      <Stack.Screen
+        name="Front"
+        component={Front}
+        options={{ animation: Platform.select({ ios: "slide_from_right" }) }}
+      />
       <Stack.Screen name="Back" component={Back} />
       {/* TODO: Remove the code duplication in CollectionStack */}
       <Stack.Group
