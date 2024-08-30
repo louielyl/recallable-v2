@@ -1,6 +1,6 @@
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { Icon, Text, TextField } from "app/components"
+import { Text, TextField } from "app/components"
 import { Definition, partOfSpeechToAbbreviation } from "app/data/entities/definitions"
 import { HeadWord } from "app/data/entities/headWords"
 import { colors, spacing } from "app/theme"
@@ -82,7 +82,7 @@ export default function HeadWordDefinitions({
       },
       { text: "Cancel", style: "cancel" },
     ])
-  const discardAlert = (_: number) =>
+  const discardAlert = () =>
     Alert.alert("Undo Changes?", "This will undo the changes you just did.", [
       {
         text: "Undo",
@@ -166,7 +166,7 @@ export default function HeadWordDefinitions({
           </>
         ) : (
           <TouchableOpacity onPress={navigateToEdit}>
-            <Feather name="edit-3" color={colors.tint} size={spacing.md} />
+            <Feather name="edit-3" color={colors.tint} size={spacing.lg} />
           </TouchableOpacity>
         )}
       </View>
@@ -191,7 +191,9 @@ export default function HeadWordDefinitions({
                         return (
                           <TouchableOpacity
                             onPress={() =>
-                              setValue(`definitions.${index}.${key as keyof Definition}`, !value)
+                              setValue(`definitions.${index}.${key as keyof Definition}`, !value, {
+                                shouldDirty: true,
+                              })
                             }
                           >
                             <Text
