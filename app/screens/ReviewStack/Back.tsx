@@ -1,5 +1,5 @@
-import { Button, Screen } from "app/components"
-import { ScrollView, View, ViewStyle } from "react-native"
+import { Button, Screen, Text } from "app/components"
+import { ScrollView, TextStyle, View, ViewStyle } from "react-native"
 import { Rating } from "ts-fsrs"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import { ReviewParamList } from "./ReviewStack"
@@ -13,6 +13,7 @@ import { useEffect } from "react"
 import { HeaderBackButton } from "@react-navigation/elements"
 import HeadWordDefinitions from "../HeadWordDetailScreen/HeadWordDefinitions"
 import { findHeadWordDefinitionMappingsByHeadWord } from "app/data/crud/headWordDefinitionMappings"
+import { TouchableOpacity } from "react-native-gesture-handler"
 
 export function Back({
   navigation,
@@ -70,21 +71,33 @@ export function Back({
         />
       </ScrollView>
       <View style={$buttonContainer}>
-        <Button
-          onPress={() => mutate({ card: card!, rating: Rating.Good })}
-          style={$button}
-          text={"good"}
-        />
-        <Button
-          onPress={() => mutate({ card: card!, rating: Rating.Hard })}
-          style={$button}
-          text={"hard"}
-        />
-        <Button
-          onPress={() => mutate({ card: card!, rating: Rating.Again })}
-          style={$button}
-          text={"again"}
-        />
+        <View style={{ flex: 1 }}>
+          <TouchableOpacity
+            style={$button}
+            onPress={() => mutate({ card: card!, rating: Rating.Good })}
+          >
+            <Text text="Good" style={$buttonMainText} weight="semiBold" />
+            <Text size="sm" text="date" style={$buttonText} />
+          </TouchableOpacity>
+        </View>
+        <View style={{ flex: 1 }}>
+          <TouchableOpacity
+            style={$button}
+            onPress={() => mutate({ card: card!, rating: Rating.Hard })}
+          >
+            <Text text="Hard" style={$buttonMainText} weight="semiBold" />
+            <Text size="sm" text="date" style={$buttonText} />
+          </TouchableOpacity>
+        </View>
+        <View style={{ flex: 1 }}>
+          <TouchableOpacity
+            style={$button}
+            onPress={() => mutate({ card: card!, rating: Rating.Again })}
+          >
+            <Text text="Again" style={$buttonMainText} weight="semiBold" />
+            <Text size="sm" text="date" style={$buttonText} />
+          </TouchableOpacity>
+        </View>
       </View>
     </Screen>
   )
@@ -92,13 +105,28 @@ export function Back({
 
 const $screenContainer: ViewStyle = {
   flex: 1,
+  backgroundColor: colors.palette.neutral100,
 }
 
 const $buttonContainer: ViewStyle = {
-  alignSelf: "flex-end",
   flexDirection: "row",
+  gap: spacing.xxs,
+  marginHorizontal: spacing.xxs,
+  marginBottom: spacing.xxs,
 }
 
 const $button: ViewStyle = {
-  flex: 1,
+  borderColor: colors.tint,
+  borderWidth: 1,
+  borderRadius: 4,
+}
+
+const $buttonText: TextStyle = {
+  textAlign: "center",
+  color: colors.palette.primary400,
+}
+
+const $buttonMainText: TextStyle = {
+  ...$buttonText,
+  color: colors.tint,
 }
