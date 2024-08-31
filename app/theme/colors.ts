@@ -31,7 +31,16 @@ const palette = {
   accent500: "#FFBB50",
 
   angry100: "#F2D6CD",
+  angry200: "#FFB6A5",
+  angry300: "#FF8A6B",
+  angry400: "#FF5E4C",
   angry500: "#C03403",
+
+  safe100: "#B5E0C3",
+  safe200: "#84D6A6",
+  safe300: "#53CB89",
+  safe400: "#22C172",
+  safe500: "#00B65A",
 
   overlay20: "rgba(25, 16, 21, 0.2)",
   overlay50: "rgba(25, 16, 21, 0.5)",
