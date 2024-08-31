@@ -88,7 +88,7 @@ export async function createCard(
   return dbCardToCard(dbCard)
 }
 
-export async function findScheduledCards(db: DBAPI, {}): Promise<ScheduledCard[]> {
+export async function findScheduledCards(db: DBAPI, { }): Promise<ScheduledCard[]> {
   const cards: Card[] = await db.find(cardStatementGenerator.findTodaysCards())
   return Promise.all(
     cards.map(async (card) => {
@@ -146,14 +146,18 @@ export async function updateCard(db: DBAPI, { id, ...params }: CardUpdate): Prom
 }
 
 export async function deleteCard(db: DBAPI, { id, head_word_id }: CardDelete) {
-  if (id) {
-    return db.run(cardStatementGenerator.getDeleteStatement(), { $id: id })
+  try {
+    if (id) {
+      return db.run(cardStatementGenerator.getDeleteStatement(), { $id: id })
+    }
+    if (head_word_id) {
+      const card = await db.get(cardStatementGenerator.getSelectByHeadWordId(), {
+        $head_word_id: head_word_id,
+      })
+      return db.run(cardStatementGenerator.getDeleteStatement(), { $id: card.id })
+    }
+  } catch (e) {
+    console.error(e)
+    throw e
   }
-  if (head_word_id) {
-    const card = await db.get(cardStatementGenerator.getSelectByHeadWordId(), {
-      $head_word_id: head_word_id,
-    })
-    return db.run(cardStatementGenerator.getDeleteStatement(), { $id: card.id })
-  }
-  throw new Error("This shouldn't happen")
 }
