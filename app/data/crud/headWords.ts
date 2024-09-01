@@ -89,6 +89,7 @@ export async function createHeadWord(
 
 export async function getHeadWord(db: DBAPI, { id, content }: HeadWordRead): Promise<HeadWord> {
   let result
+
   if (id)
     result = (await db.get(headWordStatementGenerator.getSelectStatement(), {
       $id: id,
@@ -99,9 +100,8 @@ export async function getHeadWord(db: DBAPI, { id, content }: HeadWordRead): Pro
       $content: content,
     })) as DBHeadWord
 
-  if (result) {
-    return dbHeadWordToHeadWord(result)
-  }
+  if (result) return dbHeadWordToHeadWord(result)
+
   throw new Error("Head word not found")
 }
 
