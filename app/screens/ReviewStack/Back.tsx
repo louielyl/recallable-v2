@@ -16,6 +16,7 @@ import { findHeadWordDefinitionMappingsByHeadWord } from "app/data/crud/headWord
 import { TouchableOpacity } from "react-native-gesture-handler"
 import { getParameters } from "app/data/crud/parameters"
 import { format } from "date-fns"
+import { cardQueryKey, fsrsQueryKey, headWordDefinitionMappingQueryKey } from "app/queries/keys"
 
 export function Back({
   navigation,
@@ -26,28 +27,32 @@ export function Back({
   const db = new DBAPI(useSQLiteContext())
   const queryClient = useQueryClient()
   const { data: parameters } = useQuery({
-    queryKey: ["fsrs", "parameters"],
+    queryKey: fsrsQueryKey.parameters(),
     queryFn: () => getParameters(db, {}),
   })
-  const invalidateReviewCards = () => queryClient.invalidateQueries({ queryKey: ["find", "card"] })
   const { data: mappings } = useQuery({
-    queryKey: ["find", "definition", "mappings", headWord],
+    queryKey: headWordDefinitionMappingQueryKey.itemByContent(headWord),
     queryFn: () => findHeadWordDefinitionMappingsByHeadWord(db, { content: headWord }),
   })
   const { data: card } = useQuery({
-    queryKey: ["get", "card", "by", "headWord", headWord],
+    queryKey: cardQueryKey.itemByContent(headWord),
     queryFn: () => getCardByHeadWord(db, { content: headWord }),
   })
   const { mutate } = useMutation({
     mutationFn: ({ card, rating }: CardSchedule) => scheduleCard(db, { card, rating }),
     onSuccess: () => {
-      invalidateReviewCards()
+      queryClient.invalidateQueries({ queryKey: cardQueryKey.items() })
       navigation.navigate("Front")
     },
   })
-  const schedules = parameters && card && new FSRS(parameters).repeat(card, new Date())
+  const schedules =
+    (parameters && card && new FSRS(parameters).repeat(card, new Date())) || undefined
 
   useEffect(() => {
+    if (!card) {
+      navigation.navigate("Front")
+      queryClient.invalidateQueries({ queryKey: cardQueryKey.items() })
+    }
     navigation.getParent()?.setOptions({
       title: headWord,
       headerLeft: () => (
@@ -70,9 +75,9 @@ export function Back({
         }}
       >
         <HeadWordDefinitions
+          isCollectionMode={false}
           isEdit={false}
           headerProps={{ style: { paddingBottom: spacing.sm } }}
-          contentProps={{ style: { flex: 1, backgroundColor: colors.palette.neutral100 } }}
           headWord={headWord}
           mappings={mappings}
         />
@@ -111,7 +116,7 @@ export function Back({
 }
 
 const NextDue = ({ schedules, rating }: { schedules?: RecordLog; rating: Grade }) => {
-    return schedules ? (
+  return schedules ? (
     <Text size="sm" text={format(schedules[rating].card.due, "yyyy-MM-dd")} style={$buttonText} />
   ) : (
     <></>
