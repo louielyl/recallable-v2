@@ -3,21 +3,27 @@ import { TextStyle, View, ViewStyle } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import { ReviewParamList } from "./ReviewStack"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { findScheduledCards } from "app/data/crud/cards"
 import { useSQLiteContext } from "expo-sqlite"
 import { DBAPI } from "app/data/crud/base"
 import { colors } from "app/theme"
 import { useEffect } from "react"
 import { useRefetchOnScreenFocus } from "app/hooks/useRefetchOnScreenFocus"
+import { cardQueryKey } from "app/queries/keys"
 
 export function Front({ navigation }: NativeStackScreenProps<ReviewParamList, "Front">) {
   const db = new DBAPI(useSQLiteContext())
-  const { data, refetch } = useQuery({
-    queryKey: ["find", "card"],
+  const queryClient = useQueryClient()
+  const { data } = useQuery({
+    queryKey: cardQueryKey.items(),
     queryFn: () => findScheduledCards(db, {}),
   })
-  useRefetchOnScreenFocus(refetch)
+
+  useRefetchOnScreenFocus(() => {
+    queryClient.invalidateQueries({ queryKey: cardQueryKey.items() })
+    return new Promise(() => { })
+  })
 
   const headWord = data?.[0]?.headWord
 
