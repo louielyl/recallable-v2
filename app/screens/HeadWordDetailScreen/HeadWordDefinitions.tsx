@@ -6,7 +6,6 @@ import { HeadWord } from "app/data/entities/headWords"
 import { colors, spacing } from "app/theme"
 import React, { Fragment, useEffect, useLayoutEffect, useMemo } from "react"
 import {
-  ScrollViewProps,
   View,
   ViewProps,
   Platform,
@@ -18,28 +17,34 @@ import {
 import { CollectionParamList } from "../CollectionStack/CollectionStack"
 import { DBHeadWordDefinitionMapping } from "app/data/entities/headWordDefinitionMappings"
 import { useFieldArray, useForm, Controller } from "react-hook-form"
-import Animated, {
-  FadeIn,
-  FadeOut,
-  LinearTransition,
-  RotateOutDownRight,
-} from "react-native-reanimated"
+import Animated, { FadeIn, FadeOut, LinearTransition } from "react-native-reanimated"
 import { Entypo, Feather, FontAwesome } from "@expo/vector-icons"
+import { Card } from "app/data/entities/cards"
+import { ScrollView } from "react-native-gesture-handler"
 
 // import { Container } from './styles';
 export type HeadWordDefinitionsProps = {
-  isEdit: boolean
-  headerProps?: ViewProps
-  contentProps?: ScrollViewProps
+  addCard?: () => void
+  card?: Card | null
+  deleteCard?: () => void
+  deleteHeadWord?: () => void
   headWord: HeadWord["content"]
+  headerProps?: ViewProps
+  isCollectionMode: boolean
+  isEdit: boolean
   mappings: (DBHeadWordDefinitionMapping & { definition: Definition })[] | undefined
   updateDefinitions?: (data: any) => void
 }
 
 export default function HeadWordDefinitions({
-  mappings,
-  isEdit,
+  addCard,
+  card,
+  deleteHeadWord,
+  deleteCard,
   headWord,
+  isCollectionMode,
+  isEdit,
+  mappings,
   updateDefinitions,
 }: HeadWordDefinitionsProps) {
   const navigation = useNavigation<NativeStackNavigationProp<CollectionParamList>>()
@@ -61,17 +66,34 @@ export default function HeadWordDefinitions({
   const { fields, append, remove } = useFieldArray<{
     definitions: Partial<Definition & { mappingId: string }>[]
   }>({ control, name: "definitions" })
-  const onSubmit = (data: any) => updateDefinitions && updateDefinitions(data)
+
   useEffect(() => {
     definitions && reset({ definitions })
   }, [definitions])
+
   useLayoutEffect(() => {
     return () => {
       isEdit && handleSubmit(onSubmit)()
     }
   }, [])
 
-  const deleteAlert = (index: number) =>
+  const onSubmit = (data: any) => updateDefinitions && updateDefinitions(data)
+
+  const deleteCardAlert = () =>
+    Alert.alert(
+      "Remove from Collection?",
+      "The study record will be permanetly deleted from the app.",
+      [
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: deleteCard,
+        },
+        { text: "Cancel", style: "cancel" },
+      ],
+    )
+
+  const deleteDefinitionAlert = (index: number) =>
     Alert.alert("Delete Definition?", "This definition will be permanetly deleted from the app.", [
       {
         text: "Delete",
@@ -82,6 +104,7 @@ export default function HeadWordDefinitions({
       },
       { text: "Cancel", style: "cancel" },
     ])
+
   const discardAlert = () =>
     Alert.alert("Undo Changes?", "This will undo the changes you just did.", [
       {
@@ -93,6 +116,7 @@ export default function HeadWordDefinitions({
       },
       { text: "Cancel", style: "cancel" },
     ])
+
   const addNewDefinition = () =>
     append({
       content: "",
@@ -131,128 +155,186 @@ export default function HeadWordDefinitions({
     navigation.navigate("WordDetailEdit", { headWord: headWord!, isEdit: true })
 
   return (
-    <View
-      style={{
-        gap: spacing.xxs,
-        paddingHorizontal: spacing.xs,
-        paddingVertical: spacing.sm,
-        backgroundColor: colors.palette.neutral100,
-      }}
-    >
-      <View style={{ flexDirection: "row", gap: spacing.xxs, marginBottom: spacing.sm }}>
-        <Text
-          text={isEdit ? "Edit Definitions" : "Definitions"}
-          style={{ textDecorationLine: "underline", flex: 1, color: colors.tint }}
-          preset="formLabel"
-        />
-        {isEdit ? (
-          <>
-            {isDirty ? (
-              <Animated.View
-                style={{ alignSelf: "center" }}
-                entering={FadeIn}
-                exiting={RotateOutDownRight}
-              >
-                <TouchableOpacity onPress={discardAlert}>
-                  <FontAwesome name="undo" size={spacing.md} color={colors.tint} />
-                </TouchableOpacity>
-              </Animated.View>
-            ) : (
-              <></>
-            )}
-            <TouchableOpacity style={{ alignSelf: "center" }} onPress={addNewDefinition}>
-              <Entypo name="plus" size={spacing.lg} color={colors.tint} />
+    <>
+      <ScrollView
+        style={{
+          gap: spacing.xxs,
+          paddingHorizontal: spacing.xs,
+          paddingVertical: spacing.sm,
+          backgroundColor: colors.palette.neutral100,
+        }}
+      >
+        <View style={{ flexDirection: "row", gap: spacing.xxs, marginBottom: spacing.sm }}>
+          <Text
+            text={isEdit ? "Edit Definitions" : "Definitions"}
+            style={{ textDecorationLine: "underline", flex: 1, color: colors.tint }}
+            preset="formLabel"
+          />
+          {isEdit ? (
+            <>
+              <TouchableOpacity style={{ alignSelf: "center" }} onPress={discardAlert}>
+                <FontAwesome
+                  name="undo"
+                  size={spacing.md}
+                  color={isDirty ? colors.tint : colors.palette.primary100}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity style={{ alignSelf: "center" }} onPress={addNewDefinition}>
+                <Entypo name="plus" size={spacing.lg} color={colors.tint} />
+              </TouchableOpacity>
+            </>
+          ) : (
+            <TouchableOpacity onPress={navigateToEdit}>
+              <Feather name="edit-3" color={colors.tint} size={spacing.lg} />
             </TouchableOpacity>
-          </>
-        ) : (
-          <TouchableOpacity onPress={navigateToEdit}>
-            <Feather name="edit-3" color={colors.tint} size={spacing.lg} />
-          </TouchableOpacity>
-        )}
-      </View>
-      <View style={{ gap: spacing.sm, paddingBottom: spacing.md }}>
-        {isEdit ? (
-          fields.map((item, index) => (
-            <Animated.View
-              key={item.id}
-              entering={FadeIn}
-              exiting={FadeOut}
-              layout={LinearTransition}
-            >
-              <View style={{ flexDirection: "row", marginBottom: spacing.xxs }}>
-                <View style={$abbreviationContainer}>
-                  {Object.entries(partOfSpeechToAbbreviation).map(([key, abbreviation]) => (
-                    <Controller
-                      key={`${item.id}.${key}`}
-                      control={control}
-                      name={`definitions.${index}.${key as keyof Definition}`}
-                      render={({ field }) => {
-                        const { value } = field
-                        return (
-                          <TouchableOpacity
-                            onPress={() =>
-                              setValue(`definitions.${index}.${key as keyof Definition}`, !value, {
-                                shouldDirty: true,
-                              })
-                            }
-                          >
-                            <Text
-                              text={abbreviation}
-                              style={value ? $partOfSpeechLabelSelected : $partOfSpeechLabel}
-                            />
-                          </TouchableOpacity>
-                        )
-                      }}
-                    />
-                  ))}
+          )}
+        </View>
+        <View style={{ gap: spacing.sm, paddingBottom: spacing.md }}>
+          {isEdit ? (
+            fields.map((item, index) => (
+              <Animated.View
+                key={item.id}
+                entering={FadeIn}
+                exiting={FadeOut}
+                layout={LinearTransition}
+              >
+                <View style={{ flexDirection: "row", marginBottom: spacing.xxs }}>
+                  <View style={$abbreviationContainer}>
+                    {Object.entries(partOfSpeechToAbbreviation).map(([key, abbreviation]) => (
+                      <Controller
+                        key={`${item.id}.${key}`}
+                        control={control}
+                        name={`definitions.${index}.${key as keyof Definition}`}
+                        render={({ field }) => {
+                          const { value } = field
+                          return (
+                            <TouchableOpacity
+                              onPress={() =>
+                                setValue(
+                                  `definitions.${index}.${key as keyof Definition}`,
+                                  !value,
+                                  {
+                                    shouldDirty: true,
+                                  },
+                                )
+                              }
+                            >
+                              <Text
+                                text={abbreviation}
+                                style={value ? $partOfSpeechLabelSelected : $partOfSpeechLabel}
+                              />
+                            </TouchableOpacity>
+                          )
+                        }}
+                      />
+                    ))}
+                  </View>
+                  <TouchableOpacity onPress={() => deleteDefinitionAlert(index)}>
+                    <Entypo name="cross" size={spacing.md} color={colors.textDim} />
+                  </TouchableOpacity>
                 </View>
-                <TouchableOpacity onPress={() => deleteAlert(index)}>
-                  <Entypo name="cross" size={spacing.md} color={colors.textDim} />
-                </TouchableOpacity>
-              </View>
-              <Controller
-                control={control}
-                name={`definitions.${index}.content`}
-                render={({ field }) => (
-                  <TextField multiline onChangeText={field.onChange} {...field} />
-                )}
-              />
-            </Animated.View>
-          ))
-        ) : definitions && definitions?.length > 0 ? (
-          definitions.map((definition) => (
-            <Animated.View
-              key={definition.id}
-              style={{ flexDirection: "row" }}
-              entering={FadeIn}
-              exiting={FadeOut}
-              layout={LinearTransition}
-            >
-              <View style={{ marginHorizontal: spacing.xxs, flex: 1 }}>
-                <View style={$abbreviationContainer}>
-                  {Object.entries(partOfSpeechToAbbreviation).map(([key, value]) =>
-                    definition[key as keyof Definition] ? (
-                      <TouchableOpacity key={key} disabled={!isEdit}>
-                        <Text text={value} style={$partOfSpeechLabelSelected} />
-                      </TouchableOpacity>
-                    ) : isEdit ? (
-                      <TouchableOpacity key={key} disabled={!isEdit}>
-                        <Text text={value} style={$partOfSpeechLabel} />
-                      </TouchableOpacity>
-                    ) : (
-                      <Fragment key={key} />
-                    ),
+                <Controller
+                  control={control}
+                  name={`definitions.${index}.content`}
+                  render={({ field }) => (
+                    <TextField multiline onChangeText={field.onChange} {...field} />
                   )}
+                />
+              </Animated.View>
+            ))
+          ) : definitions && definitions?.length > 0 ? (
+            definitions.map((definition) => (
+              <Animated.View
+                key={definition.id}
+                style={{ flexDirection: "row" }}
+                entering={FadeIn}
+                exiting={FadeOut}
+                layout={LinearTransition}
+              >
+                <View style={{ marginHorizontal: spacing.xxs, flex: 1 }}>
+                  <View style={$abbreviationContainer}>
+                    {Object.entries(partOfSpeechToAbbreviation).map(([key, value]) =>
+                      definition[key as keyof Definition] ? (
+                        <TouchableOpacity key={key} disabled={!isEdit}>
+                          <Text text={value} style={$partOfSpeechLabelSelected} />
+                        </TouchableOpacity>
+                      ) : isEdit ? (
+                        <TouchableOpacity key={key} disabled={!isEdit}>
+                          <Text text={value} style={$partOfSpeechLabel} />
+                        </TouchableOpacity>
+                      ) : (
+                        <Fragment key={key} />
+                      ),
+                    )}
+                  </View>
+                  <Text text={definition.content} />
                 </View>
-                <Text text={definition.content} />
-              </View>
-            </Animated.View>
-          ))
-        ) : (
-          <></>
-        )}
-      </View>
-    </View>
+              </Animated.View>
+            ))
+          ) : (
+            <></>
+          )}
+          {isCollectionMode && card ? (
+            <TouchableOpacity
+              style={{
+                alignSelf: "center",
+                flexDirection: "row",
+                gap: spacing.xs,
+                borderWidth: 1,
+                borderRadius: spacing.xxs,
+                borderColor: colors.palette.angry400,
+                paddingVertical: spacing.xxs,
+                paddingHorizontal: spacing.xs,
+                marginTop: spacing.sm,
+              }}
+              onPress={deleteCardAlert}
+            >
+              <Text
+                text={"Remove from collection"}
+                size="xs"
+                style={{
+                  color: colors.palette.angry400,
+                }}
+              />
+              <Feather
+                name="trash-2"
+                size={spacing.md}
+                color={colors.palette.angry400}
+                style={{ marginVertical: "auto" }}
+              />
+            </TouchableOpacity>
+          ) : (
+            <></>
+          )}
+        </View>
+      </ScrollView>
+      {isCollectionMode && !card ? (
+        <TouchableOpacity
+          style={{
+            alignSelf: "center",
+            flexDirection: "row",
+            gap: spacing.xs,
+            borderWidth: 2,
+            borderRadius: spacing.xxs,
+            borderColor: colors.palette.safe400,
+            paddingVertical: spacing.xxs,
+            paddingHorizontal: spacing.xs,
+          }}
+          onPress={addCard}
+        >
+          <Text
+            text={"Add to collection"}
+            size="xs"
+            style={{
+              color: colors.palette.safe400,
+            }}
+          />
+          <Entypo name="plus" size={spacing.lg} color={colors.palette.safe400} />
+        </TouchableOpacity>
+      ) : (
+        <></>
+      )}
+    </>
   )
 }
 
