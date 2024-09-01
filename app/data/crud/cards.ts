@@ -89,25 +89,37 @@ export async function createCard(
 }
 
 export async function findScheduledCards(db: DBAPI, { }): Promise<ScheduledCard[]> {
-  const cards: Card[] = await db.find(cardStatementGenerator.findTodaysCards())
-  return Promise.all(
-    cards.map(async (card) => {
-      const definitions: Definition[] = await db.find(
-        definitionStatementGeneartor.findDefinitionsByHeadWordId(card.head_word_id),
-      )
-      const headWord: HeadWord = await getHeadWord(db, { id: card.head_word_id })
-      return { ...card, definitions, headWord }
-    }),
-  )
+  try {
+    const cards: Card[] = await db.find(cardStatementGenerator.findTodaysCards())
+    return Promise.all(
+      cards.map(async (card) => {
+        const definitions: Definition[] = await db.find(
+          definitionStatementGeneartor.findDefinitionsByHeadWordId(card.head_word_id),
+        )
+        const headWord: HeadWord = await getHeadWord(db, { id: card.head_word_id })
+        return { ...card, definitions, headWord }
+      }),
+    )
+  } catch (e) {
+    console.log(e)
+    throw e
+  }
 }
 
-export async function getCardByHeadWord(db: DBAPI, { content }: CardRead): Promise<Card> {
-  const head_word_id = (await getHeadWord(db, { content })).id
+export async function getCardByHeadWord(db: DBAPI, { content }: CardRead): Promise<Card | null> {
+  try {
+    const head_word_id = (await getHeadWord(db, { content })).id
 
-  const dbCard = await db.get(cardStatementGenerator.getSelectByHeadWordId(), {
-    $head_word_id: head_word_id,
-  })
-  return dbCardToCard(dbCard)
+    const dbCard = await db.get(cardStatementGenerator.getSelectByHeadWordId(), {
+      $head_word_id: head_word_id,
+    })
+
+    if (!dbCard) throw new Error("No card is found")
+
+    return dbCardToCard(dbCard)
+  } catch (e) {
+    return null
+  }
 }
 
 export async function scheduleCard(db: DBAPI, { card, rating }: CardSchedule): Promise<Card> {
